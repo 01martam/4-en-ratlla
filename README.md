@@ -54,7 +54,7 @@ Amb més detall:
 6. La columna on tirar és la columna corresponent al fill amb valor màxim (el valor que té l’arrel).
 7. Finalment, destrueix l’arbre (fent anar la funció ‘free’) per alliberar la memòria reservada amb els malloc’s del punt 2. Per alliberar-la completament has de fer tants free’s com malloc’s hagis fet.
 
-##2.Implementació 
+## 2.Implementació 
 La implementació s’haurà de fer mitjançant la creació de l’arbre del MiniMax, tal i com es descriu més a baix. Cada node de l’arbre serà del tipus Node descrit a continuació: 
 ```
 #define N 8 
@@ -97,7 +97,7 @@ Si necessiteu més funcions, ho heu de decidir vosaltres. Heu de decidir les cap
 
 La idea principal en aquesta pràctica és crear funcions per a cada tasca individual. Per tant, creeu-ne tantes com cregueu necessari (teniu llibertat). Així, el codi serà més intel·ligible, escalable (ampliable) i us serà més senzill tant trobar errors com poder modificar alguna funció (arreglar-la, millorar-la, etc.) sense que això afecti la resta de funcions. Això s’aconsegueix no fent anar variables globals i que cada funció definida rebi per paràmetre tot el necessari per poder treballar (com hem fet fins ara a classe i com habitualment trobem a les funcions matemàtiques).
 
-##3.El joc 
+## 3.El joc 
 El joc del 4 en ratlla consisteix en un tauler N x N caselles, on cada fitxa es col·loca en una columna i es deixa caure fins que troba una fitxa o el fons. 
 [joc](1.png)
 Podem guardar a la matriu els valors que vulguem (com ho vam fer al laberint):
@@ -110,7 +110,7 @@ La funció que avalua una jugada la podeu implementar pel vostre compte. Aquesta
  
 Per a implementar la funció heurística del MiniMax, un consell és fer servir valors positius per a jugades favorables i negatius per a desfavorables (favorables i desfavorables a l’ordinador, que és qui ha de decidir la tirada creant l’arbre), i és important ressaltar quan es guanya o es perd una partida (valor molt positiu o negatiu, 1e6 i -1e6, per exemple). L’algorisme ha d’escollir la opció de guanyar quan pugui fer-ho i de no perdre quan hi hagi aquesta possibilitat, segons la situació del tauler. 
 
-##4.Què s’ha de fer i entregar? 
+## 4.Què s’ha de fer i entregar? 
 La pràctica consisteix en implementar el joc del 4 en ratlla fent que una persona jugui contra la màquina. Quan sigui el torn de la màquina, aquesta decidirà a quina columna tira implementantl’algorisme del MiniMax. Per a aquesta decisió, a partir d’un node inicial, muntarà l’arbre de n nivells, calcularà la millor jugada, farà la tirada al tauler i després esborrarà l’arbre que havia creat (tot això a cada torn que li toqui tirar a la màquina).
 
 És obligatori que el MiniMax s’implementi amb recursivitat.
