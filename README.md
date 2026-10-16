@@ -19,7 +19,7 @@ Una vegada s’ha creat el 1er nivell de nodes de l’arbre (fills de l’arrel)
 
 Així doncs, s’anirà creant l’arbre fins a una profunditat que fixarem abans de començar. Quan arribem a aquesta profunditat, aturarem aquesta generació de fills.
 
-[Arbre](Arbre.jpg)
+<img scr=https://github.com/01martam/4-en-ratlla/blob/ed0cfcb65291addd7868b8e5f678408732a706c8/Arbre.jpg\>
 
 Els **nodes fulla** són els nodes que no tenen fills, on hem acabat la generació de l’arbre en cada branca. 
 Per a cada node fulla se li calcula com està el tauler amb respecte al jugador ordinador (a qui li toca tirar ara, ja que generem l’arbre quan li toca a l’ordinador per a decidir quina firada farà). Avaluant eltauler en les fulles d’aquest arbre, avaluem l’estat projectat del joc després de la seqüència de moviments feta pels jugadors. Quant més profund es generi l’arbre del joc, més informació tenim sobre els possibles estats futurs de la partida i podem produir un millor moviment.  
@@ -100,7 +100,7 @@ La idea principal en aquesta pràctica és crear funcions per a cada tasca indiv
 ## 3.El joc 
 El joc del 4 en ratlla consisteix en un tauler N x N caselles, on cada fitxa es col·loca en una columna i es deixa caure fins que troba una fitxa o el fons. 
 
-[joc](Joc.jpg)
+<img scr=https://github.com/01martam/4-en-ratlla/blob/ed0cfcb65291addd7868b8e5f678408732a706c8/Joc.jpg\>
 
 Podem guardar a la matriu els valors que vulguem (com ho vam fer al laberint):
 - 0=casella buida, 
