@@ -132,7 +132,8 @@ minimax.c -> codi de les funcions del MiniMax.
 ```
 Podeu fer servir aquests noms o d’altres i afegir d’altres fitxers si ho creieu necessari.
 Podeu implementar tantes millores com cregueu necessàries. Es valorarà qualsevol cosa que implementeu.
-**Consells**
+
+### 4.1.**Consells**
 Alguns consells per a implementar la pràctica: 
 - [ ] Si teniu dificultats en on i com començar la pràctica, inicialment feu un joc del 4 en ratlla on juguin 2 jugadors humans, sense implementar el MiniMax. Fixeu-vos bé si hi ha algun tros de codi duplicat que pugueu ficar en una sola funció cridant-la vàries vegades. S’ha d’intentar evitar el codi duplicat.
 - [ ] Una vegada l’aplicació funcioni per a 2 jugadors humans, implementeu una funció que 
