@@ -134,10 +134,7 @@ Podeu fer servir aquests noms o d’altres i afegir d’altres fitxers si ho cre
 Podeu implementar tantes millores com cregueu necessàries. Es valorarà qualsevol cosa que implementeu.
 **Consells**
 Alguns consells per a implementar la pràctica: 
-- [ ]Si teniu dificultats en on i com començar la pràctica, inicialment feu un joc del 4 en ratlla 
-on juguin 2 jugadors humans, sense implementar el MiniMax. Fixeu-vos bé si hi ha algun 
-tros de codi duplicat que pugueu ficar en una sola funció cridant-la vàries vegades. S’ha 
-d’intentar evitar el codi duplicat.
+- [ ] Si teniu dificultats en on i com començar la pràctica, inicialment feu un joc del 4 en ratlla on juguin 2 jugadors humans, sense implementar el MiniMax. Fixeu-vos bé si hi ha algun tros de codi duplicat que pugueu ficar en una sola funció cridant-la vàries vegades. S’ha d’intentar evitar el codi duplicat.
 - [ ] Una vegada l’aplicació funcioni per a 2 jugadors humans, implementeu una funció que 
 decideixi la columna on tirarà l’ordinador en el seu torn. Aquesta funció ha d’implementar el 
 MiniMax: a partir d’un node inicial (o directament del tauler actual) ha de retornar un enter
