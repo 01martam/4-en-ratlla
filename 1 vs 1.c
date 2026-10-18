@@ -10,10 +10,16 @@
 #define VERMELL "\033[31m"
 #define BLAU    "\033[34m"
 #define RESET   "\033[0m"
+#define FONS_GROC "\033[43m"
+#define NEGRETA   "\033[1m"
 
+typedef struct {
+    int fila;
+    int col;
+} Posicio;
 
 //Omple el tauler amb BUIT
-void inicialitzarTauler2(char tauler[N][N]) {
+void inicialitzarTauler(char tauler[N][N]) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             tauler[i][j] = BUIT;
@@ -22,12 +28,22 @@ void inicialitzarTauler2(char tauler[N][N]) {
 }
 
 // Mostra el tauler per pantalla
-void dibuixarTauler3(char tauler[N][N]) {
+void dibuixarTauler(char tauler[N][N],Posicio *linia) {
     printf("\n  1   2   3   4   5   6   7   8\n");
     for (int i = 0; i < N; i++) {
         printf("|");
         for (int j = 0; j < N; j++) {
-            if(tauler[i][j]==MAQUINA){printf(" " VERMELL "%c" RESET " |", tauler[i][j]);}
+            int destacat = 0;
+                if (linia != NULL) {
+                    for (int k = 0; k < 4; k++) {
+                        if (linia[k].fila == i && linia[k].col == j) {
+                            destacat = 1;
+                            break;
+                        }
+                    }
+                }
+            if (destacat) {printf(" " FONS_GROC NEGRETA "%c" RESET " |", tauler[i][j]);}
+            else if(tauler[i][j]==MAQUINA){printf(" " VERMELL "%c" RESET " |", tauler[i][j]);}
             else if(tauler[i][j]==JUGADOR){printf(" " BLAU "%c" RESET " |", tauler[i][j]);}
             else {printf(" %c |", tauler[i][j]);}
         }
@@ -37,9 +53,22 @@ void dibuixarTauler3(char tauler[N][N]) {
     }
         for (int j = 0; j < N; j++) printf("----");
         printf("-\n");
+
 }
 
-void tirada3(char tauler[N][N],int col,char fitxa){
+// Comprova si la columna √©s valida (1 = s√≠, 0 = no)
+int columnaValida(char tauler[N][N], int col) {
+    if (col < 0 || col >= N) return 0;
+    return tauler[0][col] == BUIT; // Retorna 1 si la casella superior est√† buida
+    /*Equivalent
+    if (tauler[0][col] == BUIT) return 1;
+    else return 0;*/
+}
+
+
+
+
+void tirada(char tauler[N][N],int col,char fitxa){
     if(!columnaValida(tauler,col)) return;// columna invalida
     //2.Calcular la fila on cau per gravetat
     for(int i=N-1;i>=0;i--){
@@ -110,62 +139,115 @@ int ComprovarGuanyador(char tauler[N][N],char fitxa){
 
 ////////
 //Comprova si hi ha linia horitzontal guanyadora al voltant de l'ultima fitxa tirada
-int Fitxa_Linia_Horitzontal(char tauler[N][N], char fitxa, int fila, int col){
-    int aux = 1;
+int Fitxa_Linia_Horitzontal(char tauler[N][N], char fitxa, int fila, int col,Posicio L[4]){
+    int aux = 1,iniciCol=col;
     //Cap a l'esquerra
-    for (int j = col-1; j >= 0 && tauler[fila][j] == fitxa; j--) aux++;
+    for (int j = col-1; j >= 0 && tauler[fila][j] == fitxa; j--) {aux++;iniciCol=j;}
+    //iniciCol la columna m√©s a l'esquerra X(fila,iniciCol) X X X
     //Cap a la dreta
     for (int j = col+1; j < N  && tauler[fila][j] == fitxa; j++) aux++;
-    return (aux >= 4);
+    if(aux>=4){
+        for(int k=0;k<4;k++){
+            L[k].fila=fila;
+            L[k].col=iniciCol+k;
+        }
+        return 1;
+    }
+    return 0;
+
+
+
+    //return (aux >= 4);
     /*Equivalent
     if (aux >= 4) return 1;
     else return 0;*/
 }
 
 //Comprova si hi ha linia vertical guanyadora al voltant de l'ultima fitxa tirada
-int Fitxa_Linia_vertical(char tauler[N][N], char fitxa, int fila, int col){
-    int aux = 1;
+int Fitxa_Linia_vertical(char tauler[N][N], char fitxa, int fila, int col,Posicio L[4]){
+    int aux = 1,iniciFil=fila;
     //cap amunt
-    for (int i = fila-1; i >= 0 && tauler[i][col] == fitxa; i--) aux++;
+    for (int i = fila-1; i >= 0 && tauler[i][col] == fitxa; i--) {aux++;iniciFil=i;}
+    //iniciFil es la fila m√©s amunt
+//    x(iniciFil,col)
+//    x
+//    x
+//    x
     // Cap avall
     for (int i = fila+1; i < N  && tauler[i][col] == fitxa; i++) aux++;
-    return (aux >= 4);
+    if(aux>=4){
+        for(int k=0;k<4;k++){
+            L[k].col=col;
+            L[k].fila=iniciFil+k;
+        }
+        return 1;
+    }
+    return 0;
+    //return (aux >= 4);
     /*Equivalent
     if (aux >= 4) return 1;
     else return 0;*/
 }
 
 //Comprova si hi ha linia diagonal (/) guanyadora al voltant de l'ultima fitxa tirada
-int Fitxa_Linia_Diagonal_dret(char tauler[N][N], char fitxa, int fila, int col){
+int Fitxa_Linia_Diagonal_dret(char tauler[N][N], char fitxa, int fila, int col,Posicio L[4]){
     // Diagonal (/)
-    int aux = 1;
+    int aux = 1,iniciFil=fila,iniciCol=col;
     // Cap amunt-dreta
-    for (int i = fila-1, j = col+1; i >= 0 && j < N && tauler[i][j] == fitxa; i--, j++) aux++;
+    for (int i = fila-1, j = col+1; i >= 0 && j < N && tauler[i][j] == fitxa; i--, j++){ aux++;iniciFil=i;iniciCol=j;}
+    //iniciFil es la fila m√©s amunt i iniciCol la columna m√©s a la dreta
+//       x(iniciFil,iniciCol)
+//      x
+//     x
+//    x
     // Cap avall-esquerra
     for (int i = fila+1, j = col-1; i < N && j >= 0 && tauler[i][j] == fitxa; i++, j--) aux++;
-    return (aux >= 4);
+    if(aux>=4){
+        for(int k=0;k<4;k++){
+            L[k].col=iniciCol-k;
+            L[k].fila=iniciFil+k;
+        }
+        return 1;
+    }
+    return 0;
+
+
+    //return (aux >= 4);
     /*Equivalent
     if (aux >= 4) return 1;
     else return 0;*/
 }
 
 //Comprova si hi ha linia diagonal (\) guanyadora al voltant de l'ultima fitxa tirada
-int Fitxa_Linia_Diagonal_esq(char tauler[N][N], char fitxa, int fila, int col){
+int Fitxa_Linia_Diagonal_esq(char tauler[N][N], char fitxa, int fila, int col,Posicio L[4]){
     // Diagonal (\)
-    int aux = 1;
+    int aux = 1,iniciFil=fila,iniciCol=col;
     // Cap amunt-esquerra
-    for (int i = fila-1, j = col-1; i >= 0 && j >= 0 && tauler[i][j] == fitxa; i--, j--) aux++;
+    for (int i = fila-1, j = col-1; i >= 0 && j >= 0 && tauler[i][j] == fitxa; i--, j--) {aux++;iniciFil=i;iniciCol=j;}
+    //iniciFil es la fila m√©s amunt i iniciCol la columna m√©s a l'esquerra
+//    x(iniciFil,iniciCol)
+//     x
+//      x
+//       x
     // Cap avall-dreta
     for (int i = fila+1, j = col+1; i < N && j < N && tauler[i][j] == fitxa; i++, j++) aux++;
-    return (aux >= 4);
+    if(aux>=4){
+        for(int k=0;k<4;k++){
+            L[k].col=iniciCol+k;
+            L[k].fila=iniciFil+k;
+        }
+        return 1;
+    }
+    return 0;
+    //return (aux >= 4);
     /*Equivalent
     if (aux >= 4) return 1;
     else return 0;*/
 }
 
-//Si en alguna direcciÛ hi ha 4 o mÈs fitxes seguides (comptant la fitxa nova), hi ha guanyador.
-int ComprovaGuanyadorDesDe(char tauler[N][N], char fitxa, int fila, int col) {
-    return Fitxa_Linia_Horitzontal(tauler,fitxa,fila,col)||Fitxa_Linia_vertical(tauler,fitxa,fila,col)||Fitxa_Linia_Diagonal_dret(tauler,fitxa,fila,col)||Fitxa_Linia_Diagonal_esq(tauler,fitxa,fila,col);
+//Si en alguna direcci√≥ hi ha 4 o m√©s fitxes seguides (comptant la fitxa nova), hi ha guanyador.
+int ComprovaGuanyadorDesDe(char tauler[N][N], char fitxa, int fila, int col,Posicio L[4]) {
+    return Fitxa_Linia_Horitzontal(tauler,fitxa,fila,col,L)||Fitxa_Linia_vertical(tauler,fitxa,fila,col,L)||Fitxa_Linia_Diagonal_dret(tauler,fitxa,fila,col,L)||Fitxa_Linia_Diagonal_esq(tauler,fitxa,fila,col,L);
 }
 
 int Tirada_ultima_poscicio(char tauler[N][N],int col,char fitxa){
@@ -182,26 +264,18 @@ int Tirada_ultima_poscicio(char tauler[N][N],int col,char fitxa){
 }
 
 
-// Comprova si la columna Ès v‡lida (1 = sÌ, 0 = no)
-int columnaValida3(char tauler[N][N], int col) {
-    if (col < 0 || col >= N) return 0;
-    return tauler[0][col] == BUIT; // Retorna 1 si la casella superior est‡ buida
-    /*Equivalent
-    if (tauler[0][col] == BUIT) return 1;
-    else return 0;*/
-}
 
 // Compta quantes columnes NO estan plenes, es a dir el numero de posibles jugades, les quals cadascuna sera un fill
-int calcularNumeroDeFills3(char tauler[N][N]){
+int calcularNumeroDeFills(char tauler[N][N]){
 //mirar nomes la fila d'adalt de tot
     int aux=0;
     for (int j = 0; j < N; j++) {
-        if(columnaValida(tauler,j)) aux++; //si la columna es valida no est‡ plena
+        if(columnaValida(tauler,j)) aux++; //si la columna es valida no est√† plena
     }
    return aux;
 }
 
-// Comprova si el tauler est‡ ple (1 = ple, 0 = encara hi ha lloc)
+// Comprova si el tauler est√† ple (1 = ple, 0 = encara hi ha lloc)
 /*int taulerPle(char tauler[N][N]) {
     for (int j = 0; j < N; j++) {
         if (tauler[0][j] == BUIT) return 0;
@@ -209,7 +283,7 @@ int calcularNumeroDeFills3(char tauler[N][N]){
     return 1;
 }*/
 
-int taulerPle3(char tauler[N][N]) {
+int taulerPle(char tauler[N][N]) {
     for (int j = 0; j < N; j++) {
         if (columnaValida(tauler,j)) return 0;
     }
@@ -223,64 +297,130 @@ int taulerPle(char tauler[N][N]) {
 */
 
 
-
-
-
-int partida(int jugadorActual){
-    char tauler[N][N];
-    char fitxaActual;
+int demanaColumna(char tauler[N][N]) {
     int col;
-    int guanyat = 0;//TRUE
+    while (1) {
+        printf("Tria columna (1-%d): ", N);
+        if (scanf("%d", &col) != 1) {
+            while (getchar() != '\n');
+            printf("Entrada no valida.\n");
+            continue;
+        }
+        col--;   // 1-N ‚Üí 0-(N-1)
+        if (!columnaValida(tauler, col)) {
+            printf("Columna no valida o plena.\n");
+            continue;
+        }
+        return col;
+    }
+}
+
+void netejarPantalla2() {
+    printf("\033[2J\033[H");
+}
+
+void netejarPantalla() {
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
+
+
+
+
+char partida(char torn){
+    char tauler[N][N];
+    int guanyat = 0;//FALSE
+    Posicio linia[4];
 
     inicialitzarTauler(tauler);
 
-    printf("=== BENVINGUT AL 4 EN RATLLA (%dx%d) ===\n", N, N);
-
     while (!guanyat && !taulerPle(tauler)) {
-        dibuixarTauler(tauler);
-        fitxaActual = (jugadorActual == 1) ? JUGADOR : MAQUINA;
+        netejarPantalla();
+        dibuixarTauler(tauler,NULL);
 
-        printf("Jugador %d ('%c'), tria una columna (1-%d): ", jugadorActual, fitxaActual, N);
-        if (scanf("%d", &col) != 1) {
-            // Neteja del buffer d'entrada
-            while (getchar() != '\n');
-            printf("Entrada no v‡lida. Introdueix un n˙mero.\n");
-            continue;
+        if (torn==JUGADOR){//torn hum√†
+            printf("Jugador 1 ('%c') ", torn);
+            int col=demanaColumna(tauler);
+            int fila=Tirada_ultima_poscicio(tauler,col,JUGADOR);
+            guanyat=ComprovaGuanyadorDesDe(tauler,JUGADOR,fila,col,linia);
+        }else{//torn maquina (ara demoment es el 2nd jugador
+            printf("Jugador 2 ('%c') ", torn);
+            int col=demanaColumna(tauler);//ferMinimax(tauler)
+            int fila=Tirada_ultima_poscicio(tauler,col,MAQUINA);
+            guanyat=ComprovaGuanyadorDesDe(tauler,MAQUINA,fila,col,linia);
         }
-
-        col--; // Adaptem l'entrada humana (1-N) a Ìndex C (0 a N-1)
-
-        if (!columnaValida(tauler, col)) {
-            printf("Columna no v‡lida o plena. Torna-ho a provar.\n");
-            continue;
-        }
-
-        tirada(tauler, col, fitxaActual);
-        guanyat = comprovarGuanyador(tauler, fitxaActual);
-
-        if (!guanyat) {
-            // Canvi de jugador
-            jugadorActual = (jugadorActual == 1) ? 2 : 1;
+        if (!guanyat) {//canvi de jugador
+            torn = (torn == JUGADOR) ? MAQUINA : JUGADOR;
         }
     }
 
-    dibuixarTauler(tauler);
+    netejarPantalla();
 
     if (guanyat) {
-        printf("\nEnhorabona! El Jugador %d ('%c') ha guanyat!\n", jugadorActual, fitxaActual);
+        dibuixarTauler(tauler,linia);
+        printf("\nEnhorabona! El Jugador %s ('%c') ha guanyat!\n", ((torn == JUGADOR) ? "JUGADOR" : "MAQUINA"), torn);
+        return torn;
     } else {
-        printf("\nEmpat! El tauler est‡ ple.\n");
+        dibuixarTauler(tauler,NULL);
+        printf("\nEmpat! El tauler esta ple.\n");
+        return 0;
     }
 
     return 0;
-
 }
-int main(){
-    int jugadorActual = 1;//qui comenÁa
-    printf("=== BENVINGUT AL 4 EN RATLLA (%dx%d) ===\n", N, N);
-    partida(jugadorActual);
-    return 0;
 
+int demanaSiNo() {
+    char resposta;
+    while (1) {
+        printf("Vols jugar una altra partida? (s/n): ");
+        if (scanf(" %c", &resposta) != 1) {   // ‚Üê espai abans de %c ignora espais/salts
+            while (getchar() != '\n');
+            continue;
+        }
+        while (getchar() != '\n');             // neteja la resta de la l√≠nia
+
+        if (resposta == 's' || resposta == 'S') return 1;
+        if (resposta == 'n' || resposta == 'N') return 0;
+        printf("Resposta no valida. Introdueix 's' o 'n'.\n");
+    }
+}
+
+
+
+
+int main(){
+    printf("=== BENVINGUT AL 4 EN RATLLA (%dx%d) ===\n", N, N);
+    int victoriesJugador=0;
+    int victoriesMaquina=0;
+    int empats=0;
+    int numPartides=0;
+    while(1){
+        char guanyador=partida(JUGADOR);
+        numPartides++;
+        if(guanyador==JUGADOR) victoriesJugador++;
+        else if(guanyador==MAQUINA) victoriesMaquina++;
+        else empats++;
+
+        // Mostrar marcador
+        printf("\n+---------------------------------------+\n");
+        printf("|Partides jugades:     %d                |\n", numPartides);
+        printf("|Victories JUGADOR:    %d                |\n", victoriesJugador);
+        printf("|Victories MAQUINA:    %d                |\n", victoriesMaquina);
+        printf("|Empats:               %d                |\n", empats);
+        printf("+---------------------------------------+\n\n");
+
+        // Preguntar si vol jugar una altra
+        if (!demanaSiNo()) {
+            break;
+        }
+
+
+    }
+    printf("\nGracies per jugar!\n");
+    return 0;
 
 
 }
