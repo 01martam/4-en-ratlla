@@ -3,10 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define N 5
+#define N 2
 #define BUIT ' '
 #define MAQUINA 1
 #define JUGADOR 2
+#define PROFUNDITAT 3// nivells de l'arbre
 
 typedef struct node {
 	char tauler[N][N];
@@ -17,6 +18,11 @@ typedef struct node {
 int comptador=0;//variable global
 
 /*FUNCIONS*/
+int funcioHeuristica(){
+    // Per editar encara
+    return ++comptador;
+}
+
 //Omple el tauler amb BUIT
 void inicialitzarTauler(char tauler[N][N]) {
     for (int i = 0; i < N; i++) {
@@ -43,8 +49,6 @@ int calcularNumeroDeFills(char tauler[N][N]){
         if (tauler[0][j] == BUIT) aux++;//si la columna no està plena
     }
    return aux;
-   return N;
-
 }
 
 // Aquesta funció rep el tauler i el número de fill, i retorna l'índex real de la columna a la matriu
@@ -64,10 +68,10 @@ int numFillAColumna(char tauler[N][N],int numfill){
 }
 
 // Fa caure una fitxa per gravetat a la columna corresponent
-/*void Tirada(char tauler[N][N],int numfill,char fitxa){
+void Tirada(char tauler[N][N],int numfill,char fitxa){
     //1.Transformar el numfill a la columna matriu
     int col = numFillAColumna(tauler,numfill);
-    if(col==-1){return;}
+    if(col < 0 || col >= N||col==-1) return;
     //2.Calcular la fila on cau per gravetat
     for(int i=N-1;i>=0;i--){
         //3.Posar la fitxa a la fila/columna
@@ -81,20 +85,19 @@ int numFillAColumna(char tauler[N][N],int numfill){
 	//2.Calcula la fila on cau per gravetat
 	//3.Posar la fitxa a la fila/columna calculada
 }
-*/
 
-void tirada(char tauler[N][N],int numfill){}
-
+void tirada(char tauler[N][N],int numfill,char fitxa){}
+/*Arbre de nomes 2 nivells----------------------------------------------*/
 //Crea un node fill a partir d’un pare
 Node *creaNode(Node *pare, int numFill, int nivell) {
 	Node *p=malloc(sizeof(Node));
-	p->valor=++comptador;// summa i despres asigna. lo que seria la funcio heuristica
+	p->valor=funcioHeuristica();// summa i despres asigna. lo que seria la funcio heuristica
 	//1.Copiar Tauler
 	copiarTauler(p->tauler,pare->tauler);
 	//2.Tirar la fitxa a la columna que toqui
-    // Determinem la fitxa segons el nivell (Nivell 1 = 'X'(IA), Nivell 2 = 'O'(Jugador))
-    //char fitxa = (nivell == 1) ? MAQUINA : JUGADOR;
-	tirada(p->tauler,numFill);
+	// Determinem la fitxa segons el nivell (Nivell senars la maquina i parells el jugador)
+	char fitxa = (nivell % 2 == 1) ? MAQUINA : JUGADOR;
+	tirada(p->tauler,numFill,fitxa);
 	//3.Crear l'array de fills si n'ha de tenir
 	if (nivell<2) {
 		p->n_fills=calcularNumeroDeFills(p->tauler);
@@ -122,8 +125,48 @@ void creaArbre(Node *arrel) {
 		creaFills(arrel->fills[i],2);
 }
 
+
+
+/*Arbre de més de 2 nivells----------------------------------------------*/
+Node *creaNode_plus(Node *pare, int numFill, int nivell) {
+	Node *p=malloc(sizeof(Node));
+	p->valor=funcioHeuristica();
+	copiarTauler(p->tauler,pare->tauler);
+
+	char fitxa = (nivell % 2 == 1) ? MAQUINA : JUGADOR;
+	tirada(p->tauler,numFill,fitxa);
+
+	if (nivell<PROFUNDITAT) {
+		p->n_fills=calcularNumeroDeFills(p->tauler);
+		p->fills=malloc(p->n_fills * sizeof(Node *));
+		//p->valor=0;//posa el minimax
+	}
+	else {
+		p->n_fills=0;
+		p->fills=NULL;
+		//p->valor=funcioHeuristica();
+
+	}
+	return p;
+}
+
+//Es exactament la mateixa funcio que sense el plus pero com creo una nova creaNode la he de crear
+void creaFills_plus(Node *pare, int nivell) {
+	for(int i=0;i<pare->n_fills;i++) {
+		pare->fills[i]=creaNode_plus(pare,i,nivell);
+	}
+}
+void creaArbreRec(Node *node, int nivell) {
+    if (nivell > PROFUNDITAT) return;
+    creaFills_plus(node, nivell);
+    for (int i = 0; i < node->n_fills; i++)
+        creaArbreRec(node->fills[i], nivell + 1);
+}
+
+
+
 //imprimeix cada fill de l'arrel i després els fills d'aquests fills.
-//iteratiu
+//iteratiu (nomes 2 nivells)
 void recorreArbre(Node *arrel){//apuntador per evitar fer copiar encara que no editem
     for(int i=0;i<arrel->n_fills;i++){
         printf("%.0f\n",arrel->fills[i]->valor);
@@ -134,7 +177,7 @@ void recorreArbre(Node *arrel){//apuntador per evitar fer copiar encara que no e
 }
 
 //imprimeix cada fill de l'arrel i després els fills d'aquests fills.
-//Recursiu
+//Recursiu (N nivells)
 void recorreArbreRecursiu(Node *p,int Nivell){
     for(int k=0;k<Nivell;k++){printf("  ");}
     printf("%.0f\n",p->valor);
@@ -147,8 +190,6 @@ void recorreArbreRecursiu(Node *p,int Nivell){
 void esborraNode(Node *p) {
     if (p == NULL) return;
     free(p->fills);
-    p->fills = NULL;
-    p->n_fills = 0;
     free(p);
 }
 
@@ -158,7 +199,6 @@ void esborra1Nivell(Node *p) {
     if (p == NULL) return;
     for (int i = 0; i < p->n_fills; i++) {
         esborraNode(p->fills[i]);
-        p->fills[i] = NULL;
     }
     free(p->fills);
     p->fills = NULL;
@@ -166,7 +206,7 @@ void esborra1Nivell(Node *p) {
 }
 
 // Esborra TOTS els nodes de l'arbre
-void esborraArbre(Node *arrel) {
+void esborraArbre2(Node *arrel) {
     if (arrel == NULL) return;
 
     // Baixem recursivament als néts abans d'esborrar els fills
@@ -178,6 +218,20 @@ void esborraArbre(Node *arrel) {
     esborra1Nivell(arrel);   // esborra tots els fills + l'array fills
 }
 
+void esborraArbre(Node *arrel) {
+    if (arrel == NULL) return;
+
+    // Baixem recursivament als néts abans d'esborrar els fills
+    for (int i = 0; i < arrel->n_fills; i++) {
+        esborraArbre(arrel->fills[i]);
+        free(arrel->fills[i]);
+    }
+    free(arrel->fills);
+    //arrel->fills=NULL;
+    //arrel->n_fills=0;
+    //free(arrel); no fem aixo perque depen de com definim l'arrel en el main
+
+}
 
 
 
@@ -191,8 +245,8 @@ int main() {
 	arrel.fills=malloc(N*sizeof(Node *));
 	inicialitzarTauler(arrel.tauler);
 
-
-	creaArbre(&arrel);
+    //creaArbre(&arrel);
+	creaArbreRec(&arrel,1);
 	recorreArbreRecursiu(&arrel,0);
 	esborraArbre(&arrel);
 	//free(arrel) si arrel fos dinamic
