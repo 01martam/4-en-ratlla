@@ -5,8 +5,8 @@
 
 #define N 2
 #define BUIT ' '
-#define MAQUINA 1
-#define JUGADOR 2
+#define MAQUINA 'X'
+#define JUGADOR 'O'
 #define PROFUNDITAT 3// nivells de l'arbre
 
 typedef struct node {
@@ -24,7 +24,7 @@ int funcioHeuristica(){
 }
 
 //Omple el tauler amb BUIT
-void inicialitzarTauler(char tauler[N][N]) {
+void inicialitzarTauler3(char tauler[N][N]) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             tauler[i][j] = BUIT;
@@ -41,12 +41,19 @@ void copiarTauler(char desti[N][N],char origen[N][N]){
     }
 }
 
+// Comprova si la columna és vàlida (1 = sí, 0 = no)
+int columnaValida2(char tauler[N][N], int col) {
+    if (col < 0 || col >= N) return 0;
+    return tauler[0][col] == BUIT; // Retorna 1 si la casella superior està buida
+}
+
+
 // Compta quantes columnes NO estan plenes, es a dir el numero de posibles jugades, les quals cadascuna sera un fill
 int calcularNumeroDeFills(char tauler[N][N]){
 //mirar nomes la fila d'adalt de tot
     int aux=0;
     for (int j = 0; j < N; j++) {
-        if (tauler[0][j] == BUIT) aux++;//si la columna no està plena
+        if(columnaValida(tauler,j)) aux++; //si la columna es valida no està plena
     }
    return aux;
 }
@@ -56,7 +63,7 @@ int numFillAColumna(char tauler[N][N],int numfill){
     int aux=0;
     for(int j=0;j<N;j++){
         // Si la columna té espai (no està plena)
-        if (tauler[0][j] == BUIT) {
+        if (columnaValida(tauler,j)) {
             if (aux == numfill) {
                 return j; // Retorna la columna real de la matriu
             }
@@ -71,7 +78,7 @@ int numFillAColumna(char tauler[N][N],int numfill){
 void Tirada(char tauler[N][N],int numfill,char fitxa){
     //1.Transformar el numfill a la columna matriu
     int col = numFillAColumna(tauler,numfill);
-    if(col < 0 || col >= N||col==-1) return;
+    if(col < 0 || col >= N) return;
     //2.Calcular la fila on cau per gravetat
     for(int i=N-1;i>=0;i--){
         //3.Posar la fitxa a la fila/columna
@@ -86,7 +93,7 @@ void Tirada(char tauler[N][N],int numfill,char fitxa){
 	//3.Posar la fitxa a la fila/columna calculada
 }
 
-void tirada(char tauler[N][N],int numfill,char fitxa){}
+void tirada2(char tauler[N][N],int numfill,char fitxa){}
 /*Arbre de nomes 2 nivells----------------------------------------------*/
 //Crea un node fill a partir d’un pare
 Node *creaNode(Node *pare, int numFill, int nivell) {
@@ -238,18 +245,18 @@ void esborraArbre(Node *arrel) {
 /*MAIN*/
 
 
-int main() {
-	Node arrel;
-	arrel.valor=0;//valor posat pel recorreArbre
-	arrel.n_fills=N;
-	arrel.fills=malloc(N*sizeof(Node *));
-	inicialitzarTauler(arrel.tauler);
-
-    //creaArbre(&arrel);
-	creaArbreRec(&arrel,1);
-	recorreArbreRecursiu(&arrel,0);
-	esborraArbre(&arrel);
-	//free(arrel) si arrel fos dinamic
-
-	return 0;
-}
+//int main() {
+//	Node arrel;
+//	arrel.valor=0;//valor posat pel recorreArbre
+//	arrel.n_fills=N;
+//	arrel.fills=malloc(N*sizeof(Node *));
+//	inicialitzarTauler(arrel.tauler);
+//
+//    //creaArbre(&arrel);
+//	creaArbreRec(&arrel,1);
+//	recorreArbreRecursiu(&arrel,0);
+//	esborraArbre(&arrel);
+//	//free(arrel) si arrel fos dinamic
+//
+//	return 0;
+//}
