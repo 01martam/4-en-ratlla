@@ -47,7 +47,6 @@ void dibuixarTauler(char tauler[N][N],Posicio *linia) {
             else if(tauler[i][j]==JUGADOR){printf(" " BLAU "%c" RESET " |", tauler[i][j]);}
             else {printf(" %c |", tauler[i][j]);}
         }
-        for (int j = 0; j < N; j++) printf("    ");
         printf("\n");
 
     }
