@@ -345,13 +345,13 @@ char partida(char torn){
             printf("Jugador 1 ('%c') ", torn);
             Posicio p;
             p.col=demanaColumna(tauler);
-            p.fila=Tirada_ultima_poscicio(tauler,col,JUGADOR);
+            p.fila=Tirada_ultima_poscicio(tauler,p.col,JUGADOR);
             guanyat=ComprovaGuanyadorDesDe(tauler,JUGADOR,p,linia);
         }else{//torn maquina (ara demoment es el 2nd jugador
             printf("Jugador 2 ('%c') ", torn);
             Posicio p;
             p.col=demanaColumna(tauler);//ferMinimax(tauler)
-            p.fila=Tirada_ultima_poscicio(tauler,col,MAQUINA);
+            p.fila=Tirada_ultima_poscicio(tauler,p.col,MAQUINA);
             guanyat=ComprovaGuanyadorDesDe(tauler,MAQUINA,p,linia);
         }
         if (!guanyat) {//canvi de jugador
