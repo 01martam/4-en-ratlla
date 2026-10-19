@@ -6,6 +6,7 @@
 #define MAQUINA 'X'
 #define JUGADOR 'O'
 #define PROFUNDITAT 3// nivells de l'arbre
+#define INF 1e9
 
 typedef struct node {
 	char tauler[N][N];
@@ -17,11 +18,12 @@ typedef struct node {
 int comptador=0;//variable global
 
 /*FUNCIONS*/
-int max(int a,int b){
+//Funcio que calcular el màxim entre 2 valors
+double max(double a,double b){
     return (a>b)?a:b;
 }
 //Funcio que calcular el minim entre 2 valors
-int min(int a, int b){
+double min(double a, double b){
     return (a<b)?a:b;
 }
 int funcioHeuristica(){
@@ -244,6 +246,8 @@ void esborraArbre(Node *arrel) {
     //free(arrel); no fem aixo perque depen de com definim l'arrel en el main
 
 }
+
+//Funcio minimax
 
 
 
