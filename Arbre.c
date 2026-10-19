@@ -6,7 +6,7 @@
 #define MAQUINA 'X'
 #define JUGADOR 'O'
 #define PROFUNDITAT 3// nivells de l'arbre
-#define INF 1e9
+#define INFINIT 1e9 // Variable de numero gran
 
 typedef struct node {
 	char tauler[N][N];
@@ -26,6 +26,15 @@ double max(double a,double b){
 double min(double a, double b){
     return (a<b)?a:b;
 }
+/* També estan aquestes funcions que fan el mateix que min i max 
+#include <math.h>
+
+double fmax(double x, double y);
+double fmin(double x, double y);
+o també 
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+*/
 int funcioHeuristica(){
     // Per editar encara
     return ++comptador;
@@ -248,8 +257,33 @@ void esborraArbre(Node *arrel) {
 }
 
 //Funcio minimax
-
-
+double minimax(Node *p, int nivell) {
+	//Pas 1: comprovar si estem a les fulles ( és a dir al nivell maxim de l'arbre)
+    if (p->n_fills == 0) {
+        return p->valor;
+    }
+	
+	//Pas 2:Separar els casos en si estem fent maxim o minim
+    int esMaxim = (nivell % 2 == 1);
+	//Cas maxim
+    if (esMaxim) {
+        double aux = -INFINIT;
+        for (int i = 0; i < p->n_fills; i++) {
+            aux = max(aux, minimax(p->fills[i], nivell + 1));
+        }
+        p->valor = aux;
+        return aux;
+    } 
+	//Cas minim
+	else {
+        double aux = INFINIT;
+        for (int i = 0; i < p->n_fills; i++) {
+            aux = min(aux, minimax(p->fills[i], nivell + 1));
+        }
+        p->valor = aux;
+        return aux;
+    }
+}
 
 /*MAIN*/
 
