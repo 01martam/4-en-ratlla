@@ -38,20 +38,20 @@ Passos de l’Algorisme MiniMax:
    
 Amb més detall:
 1. Decideix els nivells de profunditat de l’arbre (usualment 2, 4 o 6 ).
-2. Crea l’Arbre.
-2.1. Crea el node arrel
-2.2. Anar creant l’arbre nivell a nivell:
-2.2.1.A partir d’un node pare, es crearan els fills. 
-2.2.2.A cada node nou: creem el node (malloc), copiem el tauler del pare i tirem la fitxa a la columna que toqui. Si el node no és fulla, calculem quants fills tindrà i creem l’array de nodes fills.
-3. Avalua a través d’una funció heurística l’estat dels taulers del nivell de sota del tot (nodes fulla). Aquesta funció retornarà un valor que s’assignarà al node.
-3.1. Si l’ordinador guanya, el valor del node ha de ser molt gran (aquesta opció ha de ser l’escollida).
-3.2. Si el jugador humà guanya, posa-hi un valor molt baix (aquesta no ha de ser escollida).
-4. Després, ves pujant per l’arbre i posant valor als pares seguint l’algorisme MiniMax:
-4.1. Assigna el valor mínim dels fills quan el pare està en un nivell senar.
-4.2. Assigna el valor màxim dels fills quan el pare està en un nivell parell.
-5. Ves aplicant valors cap a amunt seguint la regla 4 fins que el node Arrel tingui valor assignat.
-6. La columna on tirar és la columna corresponent al fill amb valor màxim (el valor que té l’arrel).
-7. Finalment, destrueix l’arbre (fent anar la funció ‘free’) per alliberar la memòria reservada amb els malloc’s del punt 2. Per alliberar-la completament has de fer tants free’s com malloc’s hagis fet.
+2. Crea l’Arbre.  
+2.1. Crea el node arrel  
+2.2. Anar creant l’arbre nivell a nivell:  
+2.2.1.A partir d’un node pare, es crearan els fills.  
+2.2.2.A cada node nou: creem el node (malloc), copiem el tauler del pare i tirem la fitxa a la columna que toqui. Si el node no és fulla, calculem quants fills tindrà i creem l’array de nodes fills.  
+3. Avalua a través d’una funció heurística l’estat dels taulers del nivell de sota del tot (nodes fulla). Aquesta funció retornarà un valor que s’assignarà al node.  
+3.1. Si l’ordinador guanya, el valor del node ha de ser molt gran (aquesta opció ha de ser l’escollida).  
+3.2. Si el jugador humà guanya, posa-hi un valor molt baix (aquesta no ha de ser escollida).  
+4. Després, ves pujant per l’arbre i posant valor als pares seguint l’algorisme MiniMax:  
+4.1. Assigna el valor mínim dels fills quan el pare està en un nivell senar.  
+4.2. Assigna el valor màxim dels fills quan el pare està en un nivell parell.  
+5. Ves aplicant valors cap a amunt seguint la regla 4 fins que el node Arrel tingui valor assignat.  
+6. La columna on tirar és la columna corresponent al fill amb valor màxim (el valor que té l’arrel).  
+7. Finalment, destrueix l’arbre (fent anar la funció ‘free’) per alliberar la memòria reservada amb els malloc’s del punt 2. Per alliberar-la completament has de fer tants free’s com malloc’s hagis fet.  
 
 ## 2.Implementació 
 La implementació s’haurà de fer mitjançant la creació de l’arbre del MiniMax, tal i com es descriu més a baix. Cada node de l’arbre serà del tipus Node descrit a continuació: 
