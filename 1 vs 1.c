@@ -47,7 +47,6 @@ void dibuixarTauler(char tauler[N][N],Posicio *linia) {
             else if(tauler[i][j]==JUGADOR){printf(" " BLAU "%c" RESET " |", tauler[i][j]);}
             else {printf(" %c |", tauler[i][j]);}
         }
-        for (int j = 0; j < N; j++) printf("    ");
         printf("\n");
 
     }
@@ -139,16 +138,16 @@ int ComprovarGuanyador(char tauler[N][N],char fitxa){
 
 ////////
 //Comprova si hi ha linia horitzontal guanyadora al voltant de l'ultima fitxa tirada
-int Fitxa_Linia_Horitzontal(char tauler[N][N], char fitxa, int fila, int col,Posicio L[4]){
-    int aux = 1,iniciCol=col;
+int Fitxa_Linia_Horitzontal(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]){
+    int aux = 1,iniciCol=p.col;
     //Cap a l'esquerra
-    for (int j = col-1; j >= 0 && tauler[fila][j] == fitxa; j--) {aux++;iniciCol=j;}
+    for (int j = p.col-1; j >= 0 && tauler[p.fila][j] == fitxa; j--) {aux++;iniciCol=j;}
     //iniciCol la columna més a l'esquerra X(fila,iniciCol) X X X
     //Cap a la dreta
-    for (int j = col+1; j < N  && tauler[fila][j] == fitxa; j++) aux++;
+    for (int j = p.col+1; j < N  && tauler[p.fila][j] == fitxa; j++) aux++;
     if(aux>=4){
         for(int k=0;k<4;k++){
-            L[k].fila=fila;
+            L[k].fila=p.fila;
             L[k].col=iniciCol+k;
         }
         return 1;
@@ -164,20 +163,20 @@ int Fitxa_Linia_Horitzontal(char tauler[N][N], char fitxa, int fila, int col,Pos
 }
 
 //Comprova si hi ha linia vertical guanyadora al voltant de l'ultima fitxa tirada
-int Fitxa_Linia_vertical(char tauler[N][N], char fitxa, int fila, int col,Posicio L[4]){
-    int aux = 1,iniciFil=fila;
+int Fitxa_Linia_vertical(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]){
+    int aux = 1,iniciFil=p.fila;
     //cap amunt
-    for (int i = fila-1; i >= 0 && tauler[i][col] == fitxa; i--) {aux++;iniciFil=i;}
+    for (int i = p.fila-1; i >= 0 && tauler[i][p.col] == fitxa; i--) {aux++;iniciFil=i;}
     //iniciFil es la fila més amunt
 //    x(iniciFil,col)
 //    x
 //    x
 //    x
     // Cap avall
-    for (int i = fila+1; i < N  && tauler[i][col] == fitxa; i++) aux++;
+    for (int i = p.fila+1; i < N  && tauler[i][p.col] == fitxa; i++) aux++;
     if(aux>=4){
         for(int k=0;k<4;k++){
-            L[k].col=col;
+            L[k].col=p.col;
             L[k].fila=iniciFil+k;
         }
         return 1;
@@ -190,18 +189,18 @@ int Fitxa_Linia_vertical(char tauler[N][N], char fitxa, int fila, int col,Posici
 }
 
 //Comprova si hi ha linia diagonal (/) guanyadora al voltant de l'ultima fitxa tirada
-int Fitxa_Linia_Diagonal_dret(char tauler[N][N], char fitxa, int fila, int col,Posicio L[4]){
+int Fitxa_Linia_Diagonal_dret(char tauler[N][N], char fitxa,Posicio p, Posicio L[4]){
     // Diagonal (/)
-    int aux = 1,iniciFil=fila,iniciCol=col;
+    int aux = 1,iniciFil=p.fila,iniciCol=p.col;
     // Cap amunt-dreta
-    for (int i = fila-1, j = col+1; i >= 0 && j < N && tauler[i][j] == fitxa; i--, j++){ aux++;iniciFil=i;iniciCol=j;}
+    for (int i = p.fila-1, j = p.col+1; i >= 0 && j < N && tauler[i][j] == fitxa; i--, j++){ aux++;iniciFil=i;iniciCol=j;}
     //iniciFil es la fila més amunt i iniciCol la columna més a la dreta
 //       x(iniciFil,iniciCol)
 //      x
 //     x
 //    x
     // Cap avall-esquerra
-    for (int i = fila+1, j = col-1; i < N && j >= 0 && tauler[i][j] == fitxa; i++, j--) aux++;
+    for (int i = p.fila+1, j = p.col-1; i < N && j >= 0 && tauler[i][j] == fitxa; i++, j--) aux++;
     if(aux>=4){
         for(int k=0;k<4;k++){
             L[k].col=iniciCol-k;
@@ -219,18 +218,18 @@ int Fitxa_Linia_Diagonal_dret(char tauler[N][N], char fitxa, int fila, int col,P
 }
 
 //Comprova si hi ha linia diagonal (\) guanyadora al voltant de l'ultima fitxa tirada
-int Fitxa_Linia_Diagonal_esq(char tauler[N][N], char fitxa, int fila, int col,Posicio L[4]){
+int Fitxa_Linia_Diagonal_esq(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]){
     // Diagonal (\)
-    int aux = 1,iniciFil=fila,iniciCol=col;
+    int aux = 1,iniciFil=p.fila,iniciCol=p.col;
     // Cap amunt-esquerra
-    for (int i = fila-1, j = col-1; i >= 0 && j >= 0 && tauler[i][j] == fitxa; i--, j--) {aux++;iniciFil=i;iniciCol=j;}
+    for (int i = p.fila-1, j = p.col-1; i >= 0 && j >= 0 && tauler[i][j] == fitxa; i--, j--) {aux++;iniciFil=i;iniciCol=j;}
     //iniciFil es la fila més amunt i iniciCol la columna més a l'esquerra
 //    x(iniciFil,iniciCol)
 //     x
 //      x
 //       x
     // Cap avall-dreta
-    for (int i = fila+1, j = col+1; i < N && j < N && tauler[i][j] == fitxa; i++, j++) aux++;
+    for (int i = p.fila+1, j = p.col+1; i < N && j < N && tauler[i][j] == fitxa; i++, j++) aux++;
     if(aux>=4){
         for(int k=0;k<4;k++){
             L[k].col=iniciCol+k;
@@ -246,8 +245,8 @@ int Fitxa_Linia_Diagonal_esq(char tauler[N][N], char fitxa, int fila, int col,Po
 }
 
 //Si en alguna direcció hi ha 4 o més fitxes seguides (comptant la fitxa nova), hi ha guanyador.
-int ComprovaGuanyadorDesDe(char tauler[N][N], char fitxa, int fila, int col,Posicio L[4]) {
-    return Fitxa_Linia_Horitzontal(tauler,fitxa,fila,col,L)||Fitxa_Linia_vertical(tauler,fitxa,fila,col,L)||Fitxa_Linia_Diagonal_dret(tauler,fitxa,fila,col,L)||Fitxa_Linia_Diagonal_esq(tauler,fitxa,fila,col,L);
+int ComprovaGuanyadorDesDe(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]) {
+    return Fitxa_Linia_Horitzontal(tauler,fitxa,p,L)||Fitxa_Linia_vertical(tauler,fitxa,p,L)||Fitxa_Linia_Diagonal_dret(tauler,fitxa,p,L)||Fitxa_Linia_Diagonal_esq(tauler,fitxa,p,L);
 }
 
 int Tirada_ultima_poscicio(char tauler[N][N],int col,char fitxa){
@@ -343,14 +342,16 @@ char partida(char torn){
 
         if (torn==JUGADOR){//torn humà
             printf("Jugador 1 ('%c') ", torn);
-            int col=demanaColumna(tauler);
-            int fila=Tirada_ultima_poscicio(tauler,col,JUGADOR);
-            guanyat=ComprovaGuanyadorDesDe(tauler,JUGADOR,fila,col,linia);
+            Posicio p;
+            p.col=demanaColumna(tauler);
+            p.fila=Tirada_ultima_poscicio(tauler,p.col,JUGADOR);
+            guanyat=ComprovaGuanyadorDesDe(tauler,JUGADOR,p,linia);
         }else{//torn maquina (ara demoment es el 2nd jugador
             printf("Jugador 2 ('%c') ", torn);
-            int col=demanaColumna(tauler);//ferMinimax(tauler)
-            int fila=Tirada_ultima_poscicio(tauler,col,MAQUINA);
-            guanyat=ComprovaGuanyadorDesDe(tauler,MAQUINA,fila,col,linia);
+            Posicio p;
+            p.col=demanaColumna(tauler);//ferMinimax(tauler)
+            p.fila=Tirada_ultima_poscicio(tauler,p.col,MAQUINA);
+            guanyat=ComprovaGuanyadorDesDe(tauler,MAQUINA,p,linia);
         }
         if (!guanyat) {//canvi de jugador
             torn = (torn == JUGADOR) ? MAQUINA : JUGADOR;
