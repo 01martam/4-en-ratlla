@@ -1,5 +1,3 @@
-//Classe 7: 02/10/26
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -19,6 +17,13 @@ typedef struct node {
 int comptador=0;//variable global
 
 /*FUNCIONS*/
+int max(int a,int b){
+    return (a>b)?a:b;
+}
+//Funcio que calcular el minim entre 2 valors
+int min(int a, int b){
+    return (a<b)?a:b;
+}
 int funcioHeuristica(){
     // Per editar encara
     return ++comptador;
