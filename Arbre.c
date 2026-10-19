@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define N 2
+#define N 8
 #define BUIT ' '
 #define MAQUINA 'X'
 #define JUGADOR 'O'
@@ -15,6 +15,7 @@ typedef struct node {
 	int n_fills;
 	double valor;
 }Node;
+
 int comptador=0;//variable global
 
 /*FUNCIONS*/
@@ -24,7 +25,7 @@ int funcioHeuristica(){
 }
 
 //Omple el tauler amb BUIT
-void inicialitzarTauler3(char tauler[N][N]) {
+void inicialitzarTauler(char tauler[N][N]) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             tauler[i][j] = BUIT;
@@ -42,7 +43,7 @@ void copiarTauler(char desti[N][N],char origen[N][N]){
 }
 
 // Comprova si la columna és vàlida (1 = sí, 0 = no)
-int columnaValida2(char tauler[N][N], int col) {
+int columnaValida(char tauler[N][N], int col) {
     if (col < 0 || col >= N) return 0;
     return tauler[0][col] == BUIT; // Retorna 1 si la casella superior està buida
 }
@@ -93,7 +94,6 @@ void Tirada(char tauler[N][N],int numfill,char fitxa){
 	//3.Posar la fitxa a la fila/columna calculada
 }
 
-void tirada2(char tauler[N][N],int numfill,char fitxa){}
 /*Arbre de nomes 2 nivells----------------------------------------------*/
 //Crea un node fill a partir d’un pare
 Node *creaNode(Node *pare, int numFill, int nivell) {
@@ -245,18 +245,18 @@ void esborraArbre(Node *arrel) {
 /*MAIN*/
 
 
-//int main() {
-//	Node arrel;
-//	arrel.valor=0;//valor posat pel recorreArbre
-//	arrel.n_fills=N;
-//	arrel.fills=malloc(N*sizeof(Node *));
-//	inicialitzarTauler(arrel.tauler);
-//
-//    //creaArbre(&arrel);
-//	creaArbreRec(&arrel,1);
-//	recorreArbreRecursiu(&arrel,0);
-//	esborraArbre(&arrel);
-//	//free(arrel) si arrel fos dinamic
-//
-//	return 0;
-//}
+int main() {
+	Node arrel;
+	arrel.valor=0;//valor posat pel recorreArbre
+	arrel.n_fills=N;
+	arrel.fills=malloc(N*sizeof(Node *));
+	inicialitzarTauler(arrel.tauler);
+
+    //creaArbre(&arrel);
+	creaArbreRec(&arrel,1);
+	recorreArbreRecursiu(&arrel,0);
+	esborraArbre(&arrel);
+	//free(arrel) si arrel fos dinamic
+
+	return 0;
+}
