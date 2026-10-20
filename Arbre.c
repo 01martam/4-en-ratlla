@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define N 8
+//#include "1 vs 1.h"
+
+#define N 2
 #define BUIT ' '
 #define MAQUINA 'X'
 #define JUGADOR 'O'
@@ -18,26 +20,23 @@ typedef struct node {
 int comptador=0;//variable global
 
 /*FUNCIONS*/
-//Funcio que calcular el màxim entre 2 valors
-double max(double a,double b){
-    return (a>b)?a:b;
-}
-//Funcio que calcular el minim entre 2 valors
-double min(double a, double b){
-    return (a<b)?a:b;
-}
-/* També estan aquestes funcions que fan el mateix que min i max 
-#include <math.h>
-
-double fmax(double x, double y);
-double fmin(double x, double y);
-o també 
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-*/
-int funcioHeuristica(){
+//funció que calcular el valor de les fulles
+/*int funcioHeuristica(){
     // Per editar encara
     return ++comptador;
+}*/
+
+double funcioHeuristica(char tauler[N][N]) {
+    int countM = 0, countJ = 0;
+
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            if (tauler[i][j] == MAQUINA) countM++;
+            else if (tauler[i][j] == JUGADOR) countJ++;
+        }
+    }
+
+    return countM - countJ;
 }
 
 //Omple el tauler amb BUIT
@@ -75,7 +74,7 @@ int calcularNumeroDeFills(char tauler[N][N]){
    return aux;
 }
 
-// Aquesta funció rep el tauler i el número de fill, i retorna l'índex real de la columna a la matriu
+// Aquesta funció rep el número de fill, i retorna l'índex real de la columna a la matriu
 int numFillAColumna(char tauler[N][N],int numfill){
     int aux=0;
     for(int j=0;j<N;j++){
@@ -110,6 +109,7 @@ void tirada(char tauler[N][N],int numfill,char fitxa){
 	//3.Posar la fitxa a la fila/columna calculada
 }
 */
+
 // Fa caure una fitxa per gravetat a la columna corresponent
 int tirada(char tauler[N][N],int col,char fitxa){//#include 1 vs 1
     if(!columnaValida(tauler,col)) return -1; //columna invalida
@@ -123,6 +123,7 @@ int tirada(char tauler[N][N],int col,char fitxa){//#include 1 vs 1
     }
     return -1; //columna plena
 }
+
 /*Arbre de nomes 2 nivells----------------------------------------------*/
 //Crea un node fill a partir d’un pare
 Node *creaNode(Node *pare, int numFill, int nivell) {
@@ -139,13 +140,13 @@ Node *creaNode(Node *pare, int numFill, int nivell) {
 	if (nivell<2) {
 		p->n_fills=calcularNumeroDeFills(p->tauler);
 		p->fills=malloc(p->n_fills * sizeof(Node *));
-		p->valor = 0;  //no cal realment pero si faig Recorrearbre podria haberhi kk si no faig minimax                                 
+		p->valor = 0;  //no cal realment pero si faig Recorrearbre podria haberhi kk si no faig minimax
 	}
 	else {//es una fulla
 		p->n_fills=0;
 		p->fills=NULL;
-		p->valor=funcioHeuristica();//nomès en les fulles s'aplica
-		
+		p->valor=funcioHeuristica(p->tauler);//nomès en les fulles s'aplica
+
 	}
 	return p;
 }
@@ -170,21 +171,22 @@ void creaArbre(Node *arrel) {
 /*Arbre de més de 2 nivells----------------------------------------------*/
 Node *creaNode_plus(Node *pare, int numFill, int nivell) {
 	Node *p=malloc(sizeof(Node));
-	p->valor=funcioHeuristica();
+	//p->valor=funcioHeuristica();
 	copiarTauler(p->tauler,pare->tauler);
 
 	char fitxa = (nivell % 2 == 1) ? MAQUINA : JUGADOR;
-	tirada(p->tauler,numFill,fitxa);
+	int col = numFillAColumna(p->tauler, numFill);
+	tirada(p->tauler,col,fitxa);
 
 	if (nivell<PROFUNDITAT) {
 		p->n_fills=calcularNumeroDeFills(p->tauler);
 		p->fills=malloc(p->n_fills * sizeof(Node *));
-		//p->valor=0;//posa el minimax
+		p->valor=0;//posa el minimax
 	}
 	else {
 		p->n_fills=0;
 		p->fills=NULL;
-		//p->valor=funcioHeuristica();
+		p->valor=funcioHeuristica(p->tauler);
 
 	}
 	return p;
@@ -196,6 +198,7 @@ void creaFills_plus(Node *pare, int nivell) {
 		pare->fills[i]=creaNode_plus(pare,i,nivell);
 	}
 }
+
 void creaArbreRec(Node *node, int nivell) {
     if (nivell > PROFUNDITAT) return;
     creaFills_plus(node, nivell);
@@ -246,61 +249,77 @@ void esborra1Nivell(Node *p) {
 }
 
 // Esborra TOTS els nodes de l'arbre
-void esborraArbre2(Node *arrel) {
-    if (arrel == NULL) return;
-
-    // Baixem recursivament als néts abans d'esborrar els fills
-    for (int i = 0; i < arrel->n_fills; i++) {
-        esborraArbre(arrel->fills[i]);
-    }
-
-    // Ara els fills ja no tenen descendents → podem esborrar el nivell
-    esborra1Nivell(arrel);   // esborra tots els fills + l'array fills
-}
-
 void esborraArbre(Node *arrel) {
     if (arrel == NULL) return;
 
     // Baixem recursivament als néts abans d'esborrar els fills
     for (int i = 0; i < arrel->n_fills; i++) {
         esborraArbre(arrel->fills[i]);
-        free(arrel->fills[i]);
     }
-    free(arrel->fills);
+    // Ara els fills ja no tenen descendents → podem esborrar el nivell
+    esborra1Nivell(arrel);   // esborra tots els fills + l'array fills
+}
+
+void esborraArbreRec(Node *arrel) {
+    if (arrel == NULL) return;
+
+    // Baixem recursivament als néts abans d'esborrar els fills
+    for (int i = 0; i < arrel->n_fills; i++) {
+        esborraArbreRec(arrel->fills[i]);
+        free(arrel->fills[i]);//allibera el fill
+    }
+    free(arrel->fills);//allibera l'array de fills
     //arrel->fills=NULL;
     //arrel->n_fills=0;
     //free(arrel); no fem aixo perque depen de com definim l'arrel en el main
 
 }
 
+
+
+
+/*MINIMAX-----------------------------------------------------------------------*/
+////Funcio que calcular el màxim entre 2 valors
+//double max(double a,double b){
+//    return (a>b)?a:b;
+//}
+////Funcio que calcular el minim entre 2 valors
+//double min(double a, double b){
+//    return (a<b)?a:b;
+//}
+
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 //Funcio minimax
 double minimax(Node *p, int nivell) {
 	//Pas 1: comprovar si estem a les fulles ( és a dir al nivell maxim de l'arbre)
     if (p->n_fills == 0) {return p->valor;}
-	
+
 	//Pas 2:Separar els casos en si estem fent maxim o minim
     int esMaxim = (nivell % 2 == 1);
 	//Cas maxim
     if (esMaxim) {
         double aux = -INFINIT;
         for (int i = 0; i < p->n_fills; i++) {
-            aux = max(aux, minimax(p->fills[i], nivell + 1));
+            aux = MAX(aux, minimax(p->fills[i], nivell + 1));
         }
         p->valor = aux;
         return aux;
-    } 
+    }
 	//Cas minim
 	else {
         double aux = INFINIT;
         for (int i = 0; i < p->n_fills; i++) {
-            aux = min(aux, minimax(p->fills[i], nivell + 1));
+            aux = MIN(aux, minimax(p->fills[i], nivell + 1));
         }
         p->valor = aux;
         return aux;
     }
 }
 
-int tiradaMaquina(Node *arrel) {// no esta bé
+//Funció que calcula la columna a traves de fer minimax
+int tiradaMaquina(Node *arrel) {
     double aux = -INFINIT;
     int col = -1;
 
@@ -316,47 +335,41 @@ int tiradaMaquina(Node *arrel) {// no esta bé
     return col;
 }
 
+/*
 double minimax(Node *p, int nivell, int *col) {
-    // Cas base: fulla
+    //Pas 1: comprovar si estem a les fulles ( és a dir al nivell maxim de l'arbre)
     if (p->n_fills == 0) {return p->valor;}
-
-    int esMaxim = (nivell % 2 == 1);
+    //Pas 2:Separar els casos en si estem fent maxim o minim
+    int esMaxim = (nivell % 2 == 1);//es senar?
 	int columna=-1;
-
+    //Cas maxim
     if (esMaxim) {
-        // MAX
         double aux = -INFINIT;
         //int columna = -1;
 
         for (int i = 0; i < p->n_fills; i++) {
             double v = minimax(p->fills[i], nivell + 1, NULL);
-			/*
-			int n= actualitzaMax(minimax(p->fills[i],nivell+1,NULL),&aux,col,i,p->tauler);
-			if(n!=-1&&col==NUlL) columna=n;
-			*/
-            if (v > aux) {
+            if (v > aux) {//calcular el maxim entre el valors i calcular la columna que es la jugada
                 aux = v;
-                if (col != NULL) {
-                    columna = numFillAColumna(p->tauler, i);
-                }
+                if (col != NULL) {columna = numFillAColumna(p->tauler, i);}
             }
         }
 
         p->valor = aux;
         if (col != NULL) *col = columna;
         return aux;
-    } else {
-        // MIN
+    }
+    //Cas minim
+    else {
+
         double aux = INFINIT;
         //int columna = -1;
 
         for (int i = 0; i < p->n_fills; i++) {
             double v = minimax(p->fills[i], nivell + 1, NULL);
-            if (v < aux) {
+            if (v < aux) {//calcular el maxim entre el valors i calcular la columna que es la jugada
                 aux = v;
-                if (col != NULL) {
-                    columna = numFillAColumna(p->tauler, i);
-                }
+                if (col != NULL) {columna = numFillAColumna(p->tauler, i);}
             }
         }
 
@@ -365,6 +378,10 @@ double minimax(Node *p, int nivell, int *col) {
         return aux;
     }
 }
+
+
+*/
+/*Idea
 
 int actualitzaMax(double v, double *aux, int *col, int i, char tauler[N][N]) {
     if (v > *aux) {
@@ -386,7 +403,51 @@ int actualitzaMin(double v, double *aux, int *col, int i, char tauler[N][N]) {
 }
 
 
-/*MAIN*/
+double minimax(Node *p, int nivell, int *col) {
+    // Cas base: fulla
+    if (p->n_fills == 0) {return p->valor;}
+
+    int esMaxim = (nivell % 2 == 1);
+	int columna=-1;
+
+    if (esMaxim) {
+        // MAX
+        double aux = -INFINIT;
+        //int columna = -1;
+
+        for (int i = 0; i < p->n_fills; i++) {
+            double v = minimax(p->fills[i], nivell + 1, NULL);
+			int n= actualitzaMax(v,&aux,col,i,p->tauler);
+			if(n!=-1&&col==NUlL) columna=n;
+        }
+
+        p->valor = aux;
+        if (col != NULL) *col = columna;
+        return aux;
+    } else {
+        // MIN
+        double aux = INFINIT;
+        //int columna = -1;
+
+        for (int i = 0; i < p->n_fills; i++) {
+            double v = minimax(p->fills[i], nivell + 1, NULL);
+            int n= actualitzaMin(v,&aux,col,i,p->tauler);
+			if(n!=-1&&col==NUlL) columna=n;
+        }
+
+        p->valor = aux;
+        if (col != NULL) *col = columna;
+        return aux;
+    }
+}
+
+
+*/
+
+
+
+
+/*MAIN-----------------------------------------------------------*/
 
 
 int main() {
@@ -396,15 +457,20 @@ int main() {
 	arrel.fills=malloc(N*sizeof(Node *));
 	inicialitzarTauler(arrel.tauler);
 
-    creaArbre(&arrel);
-	//creaArbreRec(&arrel,1);
-	int col = tiradaMaquina(arrel);       // ← una sola crida
+    //creaArbre(&arrel);
+	creaArbreRec(&arrel,1);
+	//minimax 1 crida 2 funcions
+	//int col = tiradaMaquina(&arrel);       // ← una sola crida
 
 	//crida minimax amb col
-	int col;
-    double valor = minimax(arrel, 1, &col);   // ← col s'omple amb la millor columna
+	//int col;
+    //double valor = minimax(arrel, 1, &col);   // ← col s'omple amb la millor columna
+
 // Ara col té la columna on la MÀQUINA ha de tirar
+	//recorreArbreRecursiu(&arrel,0);
+	minimax(&arrel, 0);
 	recorreArbreRecursiu(&arrel,0);
+	printf("%f",arrel.valor);
 	esborraArbre(&arrel);
 	//free(arrel) si arrel fos dinamic
 

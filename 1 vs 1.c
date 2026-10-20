@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
+#include "Arbre.h"
 #define N 8
 #define BUIT ' '
 #define MAQUINA 'X'
@@ -64,9 +64,28 @@ int columnaValida(char tauler[N][N], int col) {
     else return 0;*/
 }
 
+// Comprova si el tauler està ple (1 = ple, 0 = encara hi ha lloc)
+/*int taulerPle(char tauler[N][N]) {
+    for (int j = 0; j < N; j++) {
+        if (tauler[0][j] == BUIT) return 0;
+    }
+    return 1;
+}*/
 
+int taulerPle(char tauler[N][N]) {
+    for (int j = 0; j < N; j++) {
+        if (columnaValida(tauler,j)) return 0;
+    }
+    return 1;
+}
 
+/*
+int taulerPle(char tauler[N][N]) {
+    return calcularNumeroDeFills(tauler) == 0;
+}
+*/
 
+/* DESCARTAR
 void tirada(char tauler[N][N],int col,char fitxa){
     if(!columnaValida(tauler,col)) return;// columna invalida
     //2.Calcular la fila on cau per gravetat
@@ -78,6 +97,20 @@ void tirada(char tauler[N][N],int col,char fitxa){
         }
     }
     return;//columna plena
+}
+*/
+
+int tirada(char tauler[N][N],int col,char fitxa){
+    if(!columnaValida(tauler,col)) return -1; //columna invalida
+    //2.Calcular la fila on cau per gravetat
+    for(int i=N-1;i>=0;i--){
+        //3.Posar la fitxa a la fila/columna
+        if(tauler[i][col]==BUIT){
+            tauler[i][col]=fitxa;
+            return i;
+        }
+    }
+    return -1; //columna plena
 }
 
 //Comprova si hi ha linia horitzontal guanyadora en tot el tauler
@@ -249,23 +282,9 @@ int ComprovaGuanyadorDesDe(char tauler[N][N], char fitxa,Posicio p,Posicio L[4])
     return Fitxa_Linia_Horitzontal(tauler,fitxa,p,L)||Fitxa_Linia_vertical(tauler,fitxa,p,L)||Fitxa_Linia_Diagonal_dret(tauler,fitxa,p,L)||Fitxa_Linia_Diagonal_esq(tauler,fitxa,p,L);
 }
 
-int Tirada_ultima_poscicio(char tauler[N][N],int col,char fitxa){
-    if(!columnaValida(tauler,col)) return -1; //columna invalida
-    //2.Calcular la fila on cau per gravetat
-    for(int i=N-1;i>=0;i--){
-        //3.Posar la fitxa a la fila/columna
-        if(tauler[i][col]==BUIT){
-            tauler[i][col]=fitxa;
-            return i;
-        }
-    }
-    return -1; //columna plena
-}
-
-
 
 // Compta quantes columnes NO estan plenes, es a dir el numero de posibles jugades, les quals cadascuna sera un fill
-int calcularNumeroDeFills(char tauler[N][N]){
+/*int calcularNumeroDeFills(char tauler[N][N]){//# INCLUDE ARBRE
 //mirar nomes la fila d'adalt de tot
     int aux=0;
     for (int j = 0; j < N; j++) {
@@ -273,29 +292,9 @@ int calcularNumeroDeFills(char tauler[N][N]){
     }
    return aux;
 }
-
-// Comprova si el tauler està ple (1 = ple, 0 = encara hi ha lloc)
-/*int taulerPle(char tauler[N][N]) {
-    for (int j = 0; j < N; j++) {
-        if (tauler[0][j] == BUIT) return 0;
-    }
-    return 1;
-}*/
-
-int taulerPle(char tauler[N][N]) {
-    for (int j = 0; j < N; j++) {
-        if (columnaValida(tauler,j)) return 0;
-    }
-    return 1;
-}
-
-/*
-int taulerPle(char tauler[N][N]) {
-    return calcularNumeroDeFills(tauler) == 0;
-}
 */
 
-
+//Funció que demana al usuari que esculli una columna
 int demanaColumna(char tauler[N][N]) {
     int col;
     while (1) {
@@ -307,13 +306,32 @@ int demanaColumna(char tauler[N][N]) {
         }
         col--;   // 1-N → 0-(N-1)
         if (!columnaValida(tauler, col)) {
-            printf("Columna no valida o plena.\n");
+            if(0>col||col>N) {printf("Columna no valida.");}
+            else {printf("Columna plena.");}//printf("Columna no valida o plena.\n");
             continue;
         }
         return col;
     }
 }
 
+//Funció que demana al usuari si vol jugar mes partides o no
+int demanaSiNo() {
+    char resposta;
+    while (1) {
+        printf("Vols jugar una altra partida? (s/n): ");
+        if (scanf(" %c", &resposta) != 1) {   // ← espai abans de %c ignora espais/salts
+            while (getchar() != '\n');
+            continue;
+        }
+        while (getchar() != '\n');             // neteja la resta de la línia
+
+        if (resposta == 's' || resposta == 'S') return 1;
+        if (resposta == 'n' || resposta == 'N') return 0;
+        printf("Resposta no valida. Introdueix 's' o 'n'.\n");
+    }
+}
+
+//Funcio que netejs la pantalla de la consola
 void netejarPantalla2() {
     printf("\033[2J\033[H");
 }
@@ -328,7 +346,7 @@ void netejarPantalla() {
 
 
 
-
+//Funció que reprodueix una partida del 4 en ratlla
 char partida(char torn){
     char tauler[N][N];
     int guanyat = 0;//FALSE
@@ -344,13 +362,13 @@ char partida(char torn){
             printf("Jugador 1 ('%c') ", torn);
             Posicio p;
             p.col=demanaColumna(tauler);
-            p.fila=Tirada_ultima_poscicio(tauler,p.col,JUGADOR);
+            p.fila=tirada(tauler,p.col,JUGADOR);
             guanyat=ComprovaGuanyadorDesDe(tauler,JUGADOR,p,linia);
         }else{//torn maquina (ara demoment es el 2nd jugador
             printf("Jugador 2 ('%c') ", torn);
             Posicio p;
             p.col=demanaColumna(tauler);//ferMinimax(tauler)
-            p.fila=Tirada_ultima_poscicio(tauler,p.col,MAQUINA);
+            p.fila=tirada(tauler,p.col,MAQUINA);
             guanyat=ComprovaGuanyadorDesDe(tauler,MAQUINA,p,linia);
         }
         if (!guanyat) {//canvi de jugador
@@ -373,21 +391,7 @@ char partida(char torn){
     return 0;
 }
 
-int demanaSiNo() {
-    char resposta;
-    while (1) {
-        printf("Vols jugar una altra partida? (s/n): ");
-        if (scanf(" %c", &resposta) != 1) {   // ← espai abans de %c ignora espais/salts
-            while (getchar() != '\n');
-            continue;
-        }
-        while (getchar() != '\n');             // neteja la resta de la línia
 
-        if (resposta == 's' || resposta == 'S') return 1;
-        if (resposta == 'n' || resposta == 'N') return 0;
-        printf("Resposta no valida. Introdueix 's' o 'n'.\n");
-    }
-}
 
 
 
@@ -414,9 +418,7 @@ int main(){
         printf("+---------------------------------------+\n\n");
 
         // Preguntar si vol jugar una altra
-        if (!demanaSiNo()) {
-            break;
-        }
+        if (!demanaSiNo()) {break;}
 
 
     }
