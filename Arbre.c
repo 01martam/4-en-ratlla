@@ -316,6 +316,76 @@ int tiradaMaquina(Node *arrel) {// no esta bé
     return col;
 }
 
+double minimax(Node *p, int nivell, int *col) {
+    // Cas base: fulla
+    if (p->n_fills == 0) {return p->valor;}
+
+    int esMaxim = (nivell % 2 == 1);
+	int columna=-1;
+
+    if (esMaxim) {
+        // MAX
+        double aux = -INFINIT;
+        //int columna = -1;
+
+        for (int i = 0; i < p->n_fills; i++) {
+            double v = minimax(p->fills[i], nivell + 1, NULL);
+			/*
+			int n= actualitzaMax(minimax(p->fills[i],nivell+1,NULL),&aux,col,i,p->tauler);
+			if(n!=-1&&col==NUlL) columna=n;
+			*/
+            if (v > aux) {
+                aux = v;
+                if (col != NULL) {
+                    columna = numFillAColumna(p->tauler, i);
+                }
+            }
+        }
+
+        p->valor = aux;
+        if (col != NULL) *col = columna;
+        return aux;
+    } else {
+        // MIN
+        double aux = INFINIT;
+        //int columna = -1;
+
+        for (int i = 0; i < p->n_fills; i++) {
+            double v = minimax(p->fills[i], nivell + 1, NULL);
+            if (v < aux) {
+                aux = v;
+                if (col != NULL) {
+                    columna = numFillAColumna(p->tauler, i);
+                }
+            }
+        }
+
+        p->valor = aux;
+        if (col != NULL) *col = columna;
+        return aux;
+    }
+}
+
+int actualitzaMax(double v, double *aux, int *col, int i, char tauler[N][N]) {
+    if (v > *aux) {
+        *aux = v;
+        //if (col != NULL) {
+            return numFillAColumna(tauler, i);
+        //}
+    }
+    return -1;   // no s'ha actualitzat
+}
+int actualitzaMin(double v, double *aux, int *col, int i, char tauler[N][N]) {
+    if (v < *aux) {
+        *aux = v;
+       // if (col != NULL) {
+            return numFillAColumna(tauler, i);
+        //}
+    }
+    return -1;   // no s'ha actualitzat
+}
+
+
 /*MAIN*/
 
 
@@ -326,8 +396,14 @@ int main() {
 	arrel.fills=malloc(N*sizeof(Node *));
 	inicialitzarTauler(arrel.tauler);
 
-    //creaArbre(&arrel);
-	creaArbreRec(&arrel,1);
+    creaArbre(&arrel);
+	//creaArbreRec(&arrel,1);
+	int col = tiradaMaquina(arrel);       // ← una sola crida
+
+	//crida minimax amb col
+	int col;
+    double valor = minimax(arrel, 1, &col);   // ← col s'omple amb la millor columna
+// Ara col té la columna on la MÀQUINA ha de tirar
 	recorreArbreRecursiu(&arrel,0);
 	esborraArbre(&arrel);
 	//free(arrel) si arrel fos dinamic
