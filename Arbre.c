@@ -297,7 +297,7 @@ double minimax(Node *p, int nivell) {
     if (p->n_fills == 0) {return p->valor;}
 
 	//Pas 2:Separar els casos en si estem fent maxim o minim
-    int esMaxim = (nivell % 2 == 0);
+    int esMaxim = (nivell % 2 == 1);
 	//Cas maxim
     if (esMaxim) {
         double aux = -INFINIT;
@@ -340,7 +340,7 @@ double ferminimax(Node *p, int nivell, int *col) {
     //Pas 1: comprovar si estem a les fulles ( és a dir al nivell maxim de l'arbre)
     if (p->n_fills == 0) {return p->valor;}
     //Pas 2:Separar els casos en si estem fent maxim o minim
-    int esMaxim = (nivell % 2 == 0);
+    int esMaxim = (nivell % 2 == 1);
 	int columna=-1;
     //Cas maxim
     if (esMaxim) {
