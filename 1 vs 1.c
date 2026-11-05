@@ -305,11 +305,21 @@ int demanaColumna(char tauler[N][N]) {
             continue;
         }
         col--;   // 1-N → 0-(N-1)
-        if (!columnaValida(tauler, col)) {
-            if(0>col||col>N) {printf("Columna no valida.");}
-            else {printf("Columna plena.");}//printf("Columna no valida o plena.\n");
+        if(0>col||col>=N) {
+            printf("Columna no valida.");
             continue;
         }
+
+        if (tauler[0][col] != BUIT) {//Columna plena
+            printf("Columna plena.");
+            continue;
+        }
+
+
+//        if (!columnaValida(tauler, col)) {
+//            printf("Columna no valida o plena.\n");
+//            continue;
+//        }
         return col;
     }
 }
