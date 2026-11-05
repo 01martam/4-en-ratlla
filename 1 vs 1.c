@@ -301,17 +301,17 @@ int demanaColumna(char tauler[N][N]) {
         printf("Tria columna (1-%d): ", N);
         if (scanf("%d", &col) != 1) {
             while (getchar() != '\n');
-            printf("Entrada no valida.\n");
+            printf("Entrada no valida.(Ha de ser numeros) ");
             continue;
         }
         col--;   // 1-N → 0-(N-1)
         if(0>col||col>=N) {
-            printf("Columna no valida.");
+            printf("Columna no valida. ");
             continue;
         }
 
         if (tauler[0][col] != BUIT) {//Columna plena
-            printf("Columna plena.");
+            printf("Columna plena. ");
             continue;
         }
 
@@ -402,7 +402,17 @@ char partida(char torn){
 }
 
 
+void mostrarMarcador(int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador,double recordMaquina) {
+    printf("\n+---------------------------------------+\n");
+    printf(" Partides jugades:     %d                \n", numPartides);
+    printf(" Victories JUGADOR:    %d                \n", victoriesJugador);
+    printf(" Victories MAQUINA:    %d                \n", victoriesMaquina);
+    printf(" Empats:               %d                \n", empats);
+    printf(" Record JUGADOR:       %.0fs             \n", (recordJugador<0)?0.0:recordJugador);
+    printf(" Record MAQUINA:       %.0fs             \n", (recordMaquina<0)?0.0:recordMaquina);
+    printf("+---------------------------------------+\n\n");
 
+}
 
 
 
@@ -412,20 +422,38 @@ int main(){
     int victoriesMaquina=0;
     int empats=0;
     int numPartides=0;
+    double tempsJugador=-1;//sense record
+    double tempsMaquina=-1;
     while(1){
+        time_t inici=time(NULL);
+        
         char guanyador=partida(JUGADOR);
+        
+        time_t fi=time(NULL);
+        double durada=(double)(fi-inici);
+        
         numPartides++;
-        if(guanyador==JUGADOR) victoriesJugador++;
-        else if(guanyador==MAQUINA) victoriesMaquina++;
-        else empats++;
+        
+        if(guanyador==JUGADOR) {
+            victoriesJugador++;
+            if(tempsJugador<0||durada<tempsJugador){
+                tempsJugador=durada;
+                printf("Nou record.\n");
+            }
+        }
 
+        else if(guanyador==MAQUINA) {
+            victoriesMaquina++;
+            if(tempsMaquina<0||durada<tempsMaquina){
+                tempsMaquina=durada;
+                printf("Nou record.\n");
+            }
+        }
+        else empats++;
+        
+        printf("\nDurada de la partida: %.0f segons\n", durada);
         // Mostrar marcador
-        printf("\n+---------------------------------------+\n");
-        printf("|Partides jugades:     %d                |\n", numPartides);
-        printf("|Victories JUGADOR:    %d                |\n", victoriesJugador);
-        printf("|Victories MAQUINA:    %d                |\n", victoriesMaquina);
-        printf("|Empats:               %d                |\n", empats);
-        printf("+---------------------------------------+\n\n");
+        mostrarMarcador(numPartides,victoriesJugador,victoriesMaquina,empats,tempsJugador,tempsMaquina);
 
         // Preguntar si vol jugar una altra
         if (!demanaSiNo()) {break;}
