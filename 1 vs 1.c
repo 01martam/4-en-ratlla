@@ -29,6 +29,7 @@ void inicialitzarTauler(char tauler[N][N]) {
 
 // Mostra el tauler per pantalla
 void dibuixarTauler(char tauler[N][N],Posicio *linia) {
+    printf("======= 4 EN RATLLA (%dx%d) =======\n", N, N);
     printf("\n  1   2   3   4   5   6   7   8\n");
     for (int i = 0; i < N; i++) {
         printf("|");
@@ -417,7 +418,6 @@ void mostrarMarcador(int numPartides, int victoriesJugador, int victoriesMaquina
 
 
 int main(){
-    printf("=== BENVINGUT AL 4 EN RATLLA (%dx%d) ===\n", N, N);
     int victoriesJugador=0;
     int victoriesMaquina=0;
     int empats=0;
