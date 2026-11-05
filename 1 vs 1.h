@@ -50,6 +50,9 @@ int demanaSiNo();
 void netejarPantalla();
 void netejarPantalla2();
 
+/*MARCADOR*/
+void mostrarMarcador(int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador,double recordMaquina);
+
 /*4 EN RATLLA*/
 char partida(char torn);
 
