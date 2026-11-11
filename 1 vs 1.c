@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "Arbre.h"
 #define N 8
@@ -302,10 +303,11 @@ int demanaColumna(char tauler[N][N]) {
         printf("Tria columna (1-%d): ", N);
         if (scanf("%d", &col) != 1) {
             while (getchar() != '\n');
-            printf("Entrada no valida.(Ha de ser numeros) ");
+            printf("Entrada no valida.(Han de ser numeros) ");
             continue;
         }
         col--;   // 1-N → 0-(N-1)
+
         if(0>col||col>=N) {
             printf("Columna no valida. ");
             continue;
@@ -402,7 +404,6 @@ char partida(char torn){
     return 0;
 }
 
-
 void mostrarMarcador(int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador,double recordMaquina) {
     printf("\n+---------------------------------------+\n");
     printf(" Partides jugades:     %d                \n", numPartides);
@@ -417,6 +418,7 @@ void mostrarMarcador(int numPartides, int victoriesJugador, int victoriesMaquina
 
 
 
+
 int main(){
     int victoriesJugador=0;
     int victoriesMaquina=0;
@@ -426,14 +428,12 @@ int main(){
     double tempsMaquina=-1;
     while(1){
         time_t inici=time(NULL);
-        
         char guanyador=partida(JUGADOR);
-        
         time_t fi=time(NULL);
+
         double durada=(double)(fi-inici);
-        
         numPartides++;
-        
+
         if(guanyador==JUGADOR) {
             victoriesJugador++;
             if(tempsJugador<0||durada<tempsJugador){
@@ -450,8 +450,9 @@ int main(){
             }
         }
         else empats++;
-        
+
         printf("\nDurada de la partida: %.0f segons\n", durada);
+
         // Mostrar marcador
         mostrarMarcador(numPartides,victoriesJugador,victoriesMaquina,empats,tempsJugador,tempsMaquina);
 
@@ -460,6 +461,7 @@ int main(){
 
 
     }
+//    netejarPantalla();
     printf("\nGracies per jugar!\n");
     return 0;
 

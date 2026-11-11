@@ -1,11 +1,14 @@
-#ifndef ARBRE_H_INCLUDED
-#define ARBRE_H_INCLUDED
+#ifndef ARBRE_H
+#define ARBRE_H
+
+#include "4 enratlla.h"
+/*CONSTANTS propies del joc (dins de  "4 enratlla.h")*/
+//#define N 8
+//#define BUIT ' '
+//#define MAQUINA 'X'
+//#define JUGADOR 'O'
 
 /*CONSTANTS*/
-#define N 8
-#define BUIT ' '
-#define MAQUINA 'X'
-#define JUGADOR 'O'
 #define PROFUNDITAT 2// nivells de l'arbre
 #define INFINIT 1e9 // Variable de numero gran
 
@@ -30,13 +33,13 @@ int calcularNumeroDeFills(char tauler[N][N]);
 int numFillAColumna(char tauler[N][N],int numfill);
 
 /*ARBRE DE 2 NIVELLS*/
-Node *creaNode(Node *pare, int numFill, int nivell);
-void creaFills(Node *pare, int nivell);
-void creaArbre(Node *arrel);
+Node *creaNode2(Node *pare, int numFill, int nivell);
+void creaFills2(Node *pare, int nivell);
+void creaArbre2(Node *arrel);
 
 /*ARBRE DE +2 NIVELL*/
-Node *creaNode_plus(Node *pare, int numFill, int nivell);
-void creaFills_plus(Node *pare, int nivell);
+Node *creaNode(Node *pare, int numFill, int nivell);
+void creaFills(Node *pare, int nivell);
 void creaArbreRec(Node *node, int nivell);
 
 /*RECORRE L'ARBRE*/
@@ -52,11 +55,13 @@ void esborraArbre(Node *arrel);
 /*MINIMAX*/
 double minimax(Node *p, int nivell);
 int tiradaMaquina(Node *arrel);
-//double minimax(Node *p, int nivell, int *col);
+int tiradaMaquina_arbre(char tauler[N][N]);
 
+double ferminimax(Node *p, int nivell, int *col);
+int ferminimax_arbre(char tauler[N][N]);
 
 /*PER EDITAR*/
-int funcioHeuristica();
+double funcioHeuristica();
 
 
 #endif // ARBRE_H_INCLUDED
