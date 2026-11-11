@@ -9,7 +9,7 @@
 //#define JUGADOR 'O'
 
 /*CONSTANTS*/
-#define PROFUNDITAT 3// nivells de l'arbre
+#define PROFUNDITAT 2// nivells de l'arbre
 #define INFINIT 1e9 // Variable de numero gran
 
 /*ESTRUCTURA*/
@@ -20,7 +20,6 @@ typedef struct node {
 	double valor;
 }Node;
 /*MAXIM I MINIM*/
-
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
@@ -49,11 +48,13 @@ void recorreArbreRecursiu(Node *p,int Nivell);
 /*BORRA ARBRE*/ //PER EDITAR
 void esborraNode(Node *p);
 void esborra1Nivell(Node *p);
-void esborraArbre2(Node *arrel);
 void esborraArbre(Node *arrel);
+void esborraArbreRec(Node *arrel);
 
 /*MINIMAX*/
 double minimax(Node *p, int nivell);
+int millorColumna(Node *arrel);
+
 int tiradaMaquina(Node *arrel);
 int tiradaMaquina_arbre(char tauler[N][N]);
 
