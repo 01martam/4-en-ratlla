@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "Arbre.h"
+#include "4 enratlla.h"
 
 /*DINS de "arbre.h"
 #define N 8
@@ -61,18 +62,84 @@ int numFillAColumna(char tauler[N][N],int numfill){
 
 
 //funció que calcular el valor de les fulles
-double funcioHeuristica(){//va en 4enratlla?
-    // Per editar encara
-    //return ((double)rand() / RAND_MAX) * 2.0 * INFINIT - INFINIT;
-    return ((double)rand() / RAND_MAX) * 2.0 * 100 - 100;
-    //return ++comptador;
+//double funcioHeuristica(char tauler[N][N]){//va en 4enratlla?
+//    // Per editar encara
+//    //return ((double)rand() / RAND_MAX) * 2.0 * INFINIT - INFINIT;
+//
+//    //return ++comptador;
+//}
+
+
+double avalua(char tauler[N][N], int fila, int col, int df, int dc) {
+    int countM = 0, countJ = 0;
+
+    // Comptar fitxes de la MÀQUINA i del JUGADOR a la finestra
+    for (int k = 0; k < 4; k++) {
+        int f = fila + k * df;
+        int c = col + k * dc;
+        if (tauler[f][c] == MAQUINA) countM++;
+        else if (tauler[f][c] == JUGADOR) countJ++;
+    }
+
+    // Si hi ha fitxes dels dos jugadors, la finestra no és útil
+    if (countM > 0 && countJ > 0) return 0;
+
+    // Només fitxes de la MÀQUINA (valors positius)
+    if (countM == 4) return 1000000;   // victòria
+    if (countM == 3) return 100;       // amenaça (3 en ratlla)
+    if (countM == 2) return 10;        // 2 en ratlla
+    if (countM == 1) return 1;         // 1 fitxa
+
+    // Només fitxes del JUGADOR (valors negatius)
+    if (countJ == 4) return -1000000;  // derrota
+    if (countJ == 3) return -100;      // amenaça del JUGADOR
+    if (countJ == 2) return -10;       // 2 en ratlla del JUGADOR
+    if (countJ == 1) return -1;        // 1 fitxa del JUGADOR
+
+    return 0;   // finestra buida
+}
+
+
+
+
+//Primer mira si de casualitat ha guanyat algu llavors son les opcions millor o pitjor
+double funcioHeuristica(char tauler[N][N]) {
+    //printf("Tauler a funcioHeuristica:\n");
+    //escriureTaulerFitxer(stdout,tauler);
+    if (ComprovarGuanyador(tauler, MAQUINA)) return INFINIT;
+    if (ComprovarGuanyador(tauler, JUGADOR)) return -INFINIT;
+    //return ((double)rand() / RAND_MAX) * 2.0 * 100 - 100;
+
+    double valor = 0;
+
+    // ─── Horitzontals ───
+    for (int i = 0; i < N; i++)
+        for (int j = 0; j <= N - 4; j++)
+            valor += avalua(tauler, i, j, 0, 1);
+
+    // ─── Verticals ───
+    for (int i = 0; i <= N - 4; i++)
+        for (int j = 0; j < N; j++)
+            valor += avalua(tauler, i, j, 1, 0);
+
+    // ─── Diagonal / ───
+    for (int i = 3; i < N; i++)
+        for (int j = 0; j <= N - 4; j++)
+            valor += avalua(tauler, i, j, -1, 1);
+
+    // ─── Diagonal \ ───
+    for (int i = 0; i <= N - 4; i++)
+        for (int j = 0; j <= N - 4; j++)
+            valor += avalua(tauler, i, j, 1, 1);
+
+    return valor;
 }
 
 /**Crear Arbre de nivell exactament 2**/
 //Crea un node fill a partir d’un pare
 Node *creaNode2(Node *pare, int numFill, int nivell) {
 	Node *p=malloc(sizeof(Node));
-	//p->valor=funcioHeuristica();
+	//p->valor=funcioHeuristica(pare->tauler);
 	//1.Copiar Tauler
 	copiarTauler(p->tauler,pare->tauler);
 	//2.Tirar la fitxa a la columna que toqui
@@ -115,7 +182,7 @@ void creaArbre2(Node *arrel) {
 //Crea un node fill a partir d’un pare
 Node *creaNode(Node *pare, int numFill, int nivell) {
 	Node *p=malloc(sizeof(Node));
-	//p->valor=funcioHeuristica();
+	//p->valor=funcioHeuristica(pare->tauler);
 	copiarTauler(p->tauler,pare->tauler);
 
 	char fitxa = (nivell % 2 == 1) ? MAQUINA : JUGADOR;
@@ -387,7 +454,8 @@ int ferminimax_arbre(char tauler[N][N]) {
 
 void recorreTaulersRecursiu(Node *p,int Nivell) {
     printf("Nivell %i:%.0f\n",Nivell,p->valor);
-    dibuixarTauler(p->tauler, NULL);
+    escriureTaulerFitxer(stdout,p->tauler);
+    //dibuixarTauler(p->tauler, NULL);
 
     for (int i = 0; i < p->n_fills; i++){
         recorreTaulersRecursiu(p->fills[i],Nivell+1);
@@ -460,13 +528,33 @@ void tirada(char tauler[N][N],int numfill,char fitxa){
 /*MAIN-----------------------------------------------------------*/
 
 
-int main2() {
+int main1() {
     srand(123);
+
+    char tauler[N][N] = {
+    {'O', ' ', ' ', ' ', ' ', ' ', 'X', ' '},   // fila 0
+    {'X', ' ', ' ', ' ', ' ', ' ', 'O', ' '},   // fila 1
+    {'O', ' ', ' ', ' ', ' ', ' ', 'X', ' '},   // fila 2
+    {'X', ' ', ' ', ' ', ' ', ' ', 'O', ' '},   // fila 3
+    {'O', ' ', ' ', ' ', ' ', ' ', 'X', ' '},   // fila 4
+    {'X', ' ', ' ', 'O', ' ', ' ', 'X', ' '},   // fila 5
+    {'O', 'X', ' ', 'X', 'O', ' ', 'O', 'O'},   // fila 6
+    {'X', 'O', ' ', 'X', 'O', 'O', 'X', 'X'}    // fila 7
+    };
+
+
+
+
 	Node arrel;
 	arrel.valor=0;//valor posat pel recorreArbre
-	arrel.n_fills=N;
-	arrel.fills=malloc(N*sizeof(Node *));
+	arrel.n_fills=calcularNumeroDeFills(tauler);
+	arrel.fills=malloc(arrel.n_fills*sizeof(Node *));
 	inicialitzarTauler(arrel.tauler);
+
+    copiarTauler(arrel.tauler,tauler);
+
+
+
 
     //creaArbre(&arrel);
 	creaArbreRec(&arrel,0);

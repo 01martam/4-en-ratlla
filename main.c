@@ -6,6 +6,7 @@
 
 
 int main(){
+    srand(123);
     int victoriesJugador=0;
     int victoriesMaquina=0;
     int empats=0;
@@ -14,9 +15,25 @@ int main(){
     double tempsJugador_pitjor=-1;//sense record
     double tempsMaquina_millor=-1;
     double tempsMaquina_pitjor=-1;
+
+
+
+    // Obrir el fitxer de partides (afegint)
+    FILE *fitxerPartides = fopen("partides.txt", "a");
+    if (fitxerPartides == NULL) {
+        fprintf(stderr, "Error: no s'ha pogut obrir partides.txt\n");
+        return 1;
+    }
+
+
+    char guanyador=0;//primera partida o empat
+
     while(1){
+        //decidir qui comença la partida
+        char torn=decideixTornInicial(guanyador);
+
         time_t inici=time(NULL);
-        char guanyador=partida(JUGADOR);
+        guanyador=partida(torn,fitxerPartides);
         time_t fi=time(NULL);
 
         double durada=(double)(fi-inici);
@@ -49,13 +66,17 @@ int main(){
         printf("\nDurada de la partida: %.0f segons\n", durada);
 
         // Mostrar marcador
-        mostrarMarcador(numPartides,victoriesJugador,victoriesMaquina,empats,tempsJugador_millor,tempsMaquina_millor,tempsJugador_pitjor,tempsMaquina_pitjor);
+        mostrarMarcador(stdout,numPartides,victoriesJugador,victoriesMaquina,empats,tempsJugador_millor,tempsMaquina_millor,tempsJugador_pitjor,tempsMaquina_pitjor);
 
+        if (fitxerPartides != NULL) {
+            mostrarMarcador(fitxerPartides, numPartides, victoriesJugador, victoriesMaquina, empats,tempsJugador_millor, tempsMaquina_millor,tempsJugador_pitjor, tempsMaquina_pitjor);
+        }
         // Preguntar si vol jugar una altra
         if (!demanaSiNo()) {break;}
 
 
     }
+    fclose(fitxerPartides);
 //    netejarPantalla();
     printf("\nGracies per jugar!\n");
     return 0;

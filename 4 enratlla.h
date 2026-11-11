@@ -22,6 +22,7 @@ typedef struct {
 /*SOBRE EL TAULER*/
 void inicialitzarTauler(char tauler[N][N]);
 void dibuixarTauler(char tauler[N][N],Posicio *linia);
+void escriureTaulerFitxer(FILE *fitxer, char tauler[N][N]);
 int columnaValida(char tauler[N][N], int col);
 int taulerPle(char tauler[N][N]);
 int tirada(char tauler[N][N],int col,char fitxa);
@@ -40,6 +41,8 @@ int Fitxa_Linia_Diagonal_dret(char tauler[N][N], char fitxa,Posicio p, Posicio L
 int Fitxa_Linia_Diagonal_esq(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]);
 int ComprovaGuanyadorDesDe(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]);
 
+int Fitxa_Linia(char tauler[N][N], char fitxa, Posicio p, int df, int dc, Posicio linia[4]);
+
 /*DEMANAR AL USUARI*/
 int demanaColumna(char tauler[N][N]);
 int demanaSiNo();
@@ -49,10 +52,10 @@ void netejarPantalla();
 void netejarPantalla2();
 
 /*MARCADOR*/
-void mostrarMarcador(int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador_MILLOR,double recordMaquina_MILLOR,double recordJugador_PITJOR,double recordMaquina_PITJOR);
-
+void mostrarMarcador(FILE *sortida,int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador_MILLOR,double recordMaquina_MILLOR,double recordJugador_PITJOR,double recordMaquina_PITJOR);
 /*4 EN RATLLA*/
-char partida(char torn);
+char decideixTornInicial(char guanyadorAnterior);
+char partida(char torn,FILE *fitxer);
 
 
 

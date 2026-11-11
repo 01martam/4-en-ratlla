@@ -3,6 +3,7 @@
 #include <time.h>
 
 #include "4 enratlla.h"
+#include "Arbre.h"
 
 /*//DINS de "4 enratlla.h"
 #define N 8
@@ -22,6 +23,7 @@ typedef struct {
 } Posicio;
 */
 
+/**Sobre el tauler**/
 //Omple el tauler amb BUIT
 void inicialitzarTauler(char tauler[N][N]) {
     for (int i = 0; i < N; i++) {
@@ -31,7 +33,7 @@ void inicialitzarTauler(char tauler[N][N]) {
     }
 }
 
-// Mostra el tauler per pantalla
+// Mostra el tauler per pantalla amb colors i senyala la linia guanyadora
 void dibuixarTauler(char tauler[N][N],Posicio *linia) {
     printf("======= 4 EN RATLLA (%dx%d) =======\n", N, N);
     printf("\n  1   2   3   4   5   6   7   8\n");
@@ -59,6 +61,21 @@ void dibuixarTauler(char tauler[N][N],Posicio *linia) {
         printf("-\n");
 
 }
+
+//Mostra al fitxer el tauler simple sense colors
+void escriureTaulerFitxer(FILE *fitxer, char tauler[N][N]) {
+    fprintf(fitxer, "\n  1   2   3   4   5   6   7   8\n");
+    for (int i = 0; i < N; i++) {
+        fprintf(fitxer, "|");
+        for (int j = 0; j < N; j++) {
+            fprintf(fitxer," %c |", tauler[i][j]);
+        }
+        fprintf(fitxer, "\n");
+    }
+    for (int j = 0; j < N; j++) fprintf(fitxer,"----");
+    fprintf(fitxer,"-\n");
+}
+
 
 // Comprova si la columna és valida (1 = sí, 0 = no)
 int columnaValida(char tauler[N][N], int col) {
@@ -90,21 +107,6 @@ int taulerPle(char tauler[N][N]) {
 }
 */
 
-/* DESCARTAR
-void tirada(char tauler[N][N],int col,char fitxa){
-    if(!columnaValida(tauler,col)) return;// columna invalida
-    //2.Calcular la fila on cau per gravetat
-    for(int i=N-1;i>=0;i--){
-        //3.Posar la fitxa a la fila/columna
-        if(tauler[i][col]==BUIT){
-            tauler[i][col]=fitxa;
-            return;
-        }
-    }
-    return;//columna plena
-}
-*/
-
 int tirada(char tauler[N][N],int col,char fitxa){
     if(!columnaValida(tauler,col)) return -1; //columna invalida
     //2.Calcular la fila on cau per gravetat
@@ -118,10 +120,12 @@ int tirada(char tauler[N][N],int col,char fitxa){
     return -1; //columna plena
 }
 
+
+/**Revisar mirant tot el tauler si hem guanyat**/
 //Comprova si hi ha linia horitzontal guanyadora en tot el tauler
 int Linia_Horitzontal(char tauler[N][N],char fitxa){
     for (int i=N-1;i>=0;i--){//de abaix cap a dalt
-        for(int j=0;j<N-3;j++){// de esquerra a dreta
+        for(int j=0;j<=N-4;j++){// de esquerra a dreta
             if (tauler[i][j] == fitxa && tauler[i][j+1] == fitxa &&
                 tauler[i][j+2] == fitxa && tauler[i][j+3] == fitxa)
                 return 1;// hi ha linia horitzontal
@@ -145,7 +149,7 @@ int Linia_Vertical(char tauler[N][N],char fitxa){
 //Comprova si hi ha linia diagonal (/) guanyadora en tot el tauler
 int Linia_Diagonal_dret(char tauler[N][N],char fitxa){
     for(int i=N-1;i>=3;i--){
-        for(int j=0;j<N-3 ;j++){
+        for(int j=0;j<=N-4 ;j++){
             if (tauler[i][j] == fitxa && tauler[i-1][j+1] == fitxa &&
                 tauler[i-2][j+2] == fitxa && tauler[i-3][j+3] == fitxa)
                 return 1;//hi ha linia diagonal
@@ -171,10 +175,13 @@ int Linia_Diagonal_esq(char tauler[N][N],char fitxa){
 
 //Mira si hi algu jugador que ha guanyat
 int ComprovarGuanyador(char tauler[N][N],char fitxa){
-    return Linia_Horitzontal(tauler,fitxa)||Linia_Vertical(tauler,fitxa)||Linia_Diagonal_dret(tauler,fitxa)||Linia_Diagonal_esq(tauler,fitxa);
+    return Linia_Horitzontal(tauler,fitxa)||
+           Linia_Vertical(tauler,fitxa)||
+           Linia_Diagonal_dret(tauler,fitxa)||
+           Linia_Diagonal_esq(tauler,fitxa);
 }
 
-////////
+/**Revisar al voltant de l'última fitxa si hem guanyat**/
 //Comprova si hi ha linia horitzontal guanyadora al voltant de l'ultima fitxa tirada
 int Fitxa_Linia_Horitzontal(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]){
     int aux = 1,iniciCol=p.col;
@@ -259,14 +266,14 @@ int Fitxa_Linia_Diagonal_dret(char tauler[N][N], char fitxa,Posicio p, Posicio L
 int Fitxa_Linia_Diagonal_esq(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]){
     // Diagonal (\)
     int aux = 1,iniciFil=p.fila,iniciCol=p.col;
-    // Cap amunt-esquerra
+    // Cap amunt-dreta
     for (int i = p.fila-1, j = p.col-1; i >= 0 && j >= 0 && tauler[i][j] == fitxa; i--, j--) {aux++;iniciFil=i;iniciCol=j;}
     //iniciFil es la fila més amunt i iniciCol la columna més a l'esquerra
 //    x(iniciFil,iniciCol)
 //     x
 //      x
 //       x
-    // Cap avall-dreta
+    // Cap avall-avall
     for (int i = p.fila+1, j = p.col+1; i < N && j < N && tauler[i][j] == fitxa; i++, j++) aux++;
     if(aux>=4){
         for(int k=0;k<4;k++){
@@ -282,23 +289,62 @@ int Fitxa_Linia_Diagonal_esq(char tauler[N][N], char fitxa,Posicio p,Posicio L[4
     else return 0;*/
 }
 
+//Agrupa les 4 en una sola versió
+int Fitxa_Linia(char tauler[N][N], char fitxa, Posicio p, int df, int dc, Posicio linia[4]) {
+    int count = 1;
+    int iniciFil = p.fila, iniciCol = p.col;
+
+    // Cap endavant (df, dc)
+    for (int k = 1; k < 4; k++) {
+        int f = p.fila + k * df;
+        int c = p.col + k * dc;
+        if (f < 0 || f >= N || c < 0 || c >= N) break;
+        if (tauler[f][c] == fitxa) count++;
+        else break;
+    }
+
+    // Cap enrere (-df, -dc)
+    for (int k = 1; k < 4; k++) {
+        int f = p.fila - k * df;
+        int c = p.col - k * dc;
+        if (f < 0 || f >= N || c < 0 || c >= N) break;
+        if (tauler[f][c] == fitxa) {
+            count++;
+            iniciFil = f;
+            iniciCol = c;
+        } else {
+            break;
+        }
+    }
+
+    if (count >= 4) {
+        // Omplir linia amb les 4 posicions
+        for (int k = 0; k < 4; k++) {
+            linia[k].fila = iniciFil + k * df;
+            linia[k].col = iniciCol + k * dc;
+        }
+        return 1;
+    }
+
+    return 0;
+}
+
+
 //Si en alguna direcció hi ha 4 o més fitxes seguides (comptant la fitxa nova), hi ha guanyador.
 int ComprovaGuanyadorDesDe(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]) {
-    return Fitxa_Linia_Horitzontal(tauler,fitxa,p,L)||Fitxa_Linia_vertical(tauler,fitxa,p,L)||Fitxa_Linia_Diagonal_dret(tauler,fitxa,p,L)||Fitxa_Linia_Diagonal_esq(tauler,fitxa,p,L);
+//    return Fitxa_Linia_Horitzontal(tauler,fitxa,p,L)||
+//           Fitxa_Linia_vertical(tauler,fitxa,p,L)||
+//           Fitxa_Linia_Diagonal_dret(tauler,fitxa,p,L)||
+//           Fitxa_Linia_Diagonal_esq(tauler,fitxa,p,L);
+    return Fitxa_Linia(tauler, fitxa, p, 0, 1, L) ||    // horitzontal
+           Fitxa_Linia(tauler, fitxa, p, 1, 0, L) ||    // vertical
+           Fitxa_Linia(tauler, fitxa, p, -1, 1, L) ||   // diagonal /
+           Fitxa_Linia(tauler, fitxa, p, 1, 1, L);      // diagonal \
+
 }
 
 
-// Compta quantes columnes NO estan plenes, es a dir el numero de posibles jugades, les quals cadascuna sera un fill
-/*int calcularNumeroDeFills(char tauler[N][N]){//# INCLUDE ARBRE
-//mirar nomes la fila d'adalt de tot
-    int aux=0;
-    for (int j = 0; j < N; j++) {
-        if(columnaValida(tauler,j)) aux++; //si la columna es valida no està plena
-    }
-   return aux;
-}
-*/
-
+/**Demanar al usuari**/
 //Funció que demana al usuari que esculli una columna
 int demanaColumna(char tauler[N][N]) {
     int col;
@@ -347,7 +393,9 @@ int demanaSiNo() {
     }
 }
 
-//Funcio que netejs la pantalla de la consola
+
+/**Neteja la pantalla**/
+//Funcio que neteja la pantalla de la consola
 void netejarPantalla2() {
     printf("\033[2J\033[H");
 }
@@ -360,34 +408,61 @@ void netejarPantalla() {
     #endif
 }
 
+/**Qui comença**/
+char decideixTornInicial(char guanyadorAnterior) {
+    char tornInicial;
+    if (guanyadorAnterior == JUGADOR || guanyadorAnterior == MAQUINA) {
+        tornInicial = guanyadorAnterior;   // comença el guanyador anterior
+    } else {
+        // Empat: triar aleatori
+        tornInicial = (rand() % 2 == 0) ? JUGADOR : MAQUINA;
+    }
 
+    return tornInicial;
+}
 
+/**4 en ratlla**/
 //Funció que reprodueix una partida del 4 en ratlla
-char partida(char torn){
+char partida(char torn,FILE *fitxer){
     char tauler[N][N];
     int guanyat = 0;//FALSE
     Posicio linia[4];
 
     inicialitzarTauler(tauler);
 
+    if(fitxer!=NULL){
+        fprintf(fitxer,"\n===PARTIDA===");
+        escriureTaulerFitxer(fitxer, tauler);
+
+    }
+
     while (!guanyat && !taulerPle(tauler)) {
         netejarPantalla();
         dibuixarTauler(tauler,NULL);
 
+        Posicio p;
+
         if (torn==JUGADOR){//torn humà
             printf("Jugador('%c') ", torn);
-            Posicio p;
             p.col=demanaColumna(tauler);
             p.fila=tirada(tauler,p.col,JUGADOR);
             guanyat=ComprovaGuanyadorDesDe(tauler,JUGADOR,p,linia);
+
+            if(fitxer!=NULL){
+                fprintf(fitxer, "Torn JUGADOR ('%c'):columna %d (fila %d)\n",JUGADOR, p.col + 1, p.fila);
+                escriureTaulerFitxer(fitxer, tauler);
+            }
         }else{//torn maquina (ara demoment es el 2nd jugador
             //printf("Maquina ('%c') ", torn);
-            Posicio p;
             //p.col=demanaColumna(tauler);
             //p.col=tiradaMaquina_arbre(tauler);
             p.col=ferminimax_arbre(tauler);
             p.fila=tirada(tauler,p.col,MAQUINA);
             guanyat=ComprovaGuanyadorDesDe(tauler,MAQUINA,p,linia);
+            if(fitxer!=NULL){
+                fprintf(fitxer, "Torn MAQUINA ('%c'): columna %d (fila %d)\n",MAQUINA, p.col + 1, p.fila);
+                escriureTaulerFitxer(fitxer, tauler);
+            }
         }
         if (!guanyat) {//canvi de jugador
             torn = (torn == JUGADOR) ? MAQUINA : JUGADOR;
@@ -395,6 +470,14 @@ char partida(char torn){
     }
 
     netejarPantalla();
+
+    if (fitxer != NULL) {
+        if (guanyat) {
+            fprintf(fitxer,"\n%s ('%c') ha guanyat!\n", ((torn == JUGADOR) ? "El JUGADOR" : "La MAQUINA"), torn);
+        } else {
+            fprintf(fitxer, "\nEMPAT\n\n");
+        }
+    }
 
     if (guanyat) {
         dibuixarTauler(tauler,linia);
@@ -405,75 +488,22 @@ char partida(char torn){
         printf("\nEmpat! El tauler esta ple.\n");
         return 0;
     }
-
-    return 0;
-}
-
-void mostrarMarcador(int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador_MILLOR,double recordMaquina_MILLOR,double recordJugador_PITJOR,double recordMaquina_PITJOR) {
-    printf("\n+---------------------------------------+\n");
-    printf(" Partides jugades:     %d                \n", numPartides);
-    printf(" Victories JUGADOR:    %d                \n", victoriesJugador);
-    printf(" Victories MAQUINA:    %d                \n", victoriesMaquina);
-    printf(" Empats:               %d                \n", empats);
-    printf("+----------------JUGADOR----------------+\n");
-    printf(" Millor temps:         %.0fs             \n", (recordJugador_MILLOR<0)?0.0:recordJugador_MILLOR);
-    printf(" Pitjor temps:         %.0fs             \n", (recordJugador_PITJOR<0)?0.0:recordJugador_PITJOR);
-    printf("+----------------MAQUINA----------------+\n");
-    printf(" Millor temps:         %.0fs             \n", (recordMaquina_MILLOR<0)?0.0:recordMaquina_MILLOR);
-    printf(" Pitjor temps:         %.0fs             \n", (recordMaquina_PITJOR<0)?0.0:recordMaquina_PITJOR);
-    printf("+---------------------------------------+\n\n");
-
 }
 
 
+/**Mostrar resultats**/
+void mostrarMarcador(FILE *sortida,int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador_MILLOR,double recordMaquina_MILLOR,double recordJugador_PITJOR,double recordMaquina_PITJOR) {
+    fprintf(sortida,"\n+---------------------------------------+\n");
+    fprintf(sortida," Partides jugades:     %d                \n", numPartides);
+    fprintf(sortida," Victories JUGADOR:    %d                \n", victoriesJugador);
+    fprintf(sortida," Victories MAQUINA:    %d                \n", victoriesMaquina);
+    fprintf(sortida," Empats:               %d                \n", empats);
+    fprintf(sortida,"+----------------JUGADOR----------------+\n");
+    fprintf(sortida," Millor temps:         %.0fs             \n", (recordJugador_MILLOR<0)?0.0:recordJugador_MILLOR);
+    fprintf(sortida," Pitjor temps:         %.0fs             \n", (recordJugador_PITJOR<0)?0.0:recordJugador_PITJOR);
+    fprintf(sortida,"+----------------MAQUINA----------------+\n");
+    fprintf(sortida," Millor temps:         %.0fs             \n", (recordMaquina_MILLOR<0)?0.0:recordMaquina_MILLOR);
+    fprintf(sortida," Pitjor temps:         %.0fs             \n", (recordMaquina_PITJOR<0)?0.0:recordMaquina_PITJOR);
+    fprintf(sortida,"+---------------------------------------+\n\n");
 
-/*
-int main2(){
-    int victoriesJugador=0;
-    int victoriesMaquina=0;
-    int empats=0;
-    int numPartides=0;
-    double tempsJugador=-1;//sense record
-    double tempsMaquina=-1;
-    while(1){
-        time_t inici=time(NULL);
-        char guanyador=partida(JUGADOR);
-        time_t fi=time(NULL);
-
-        double durada=(double)(fi-inici);
-        numPartides++;
-
-        if(guanyador==JUGADOR) {
-            victoriesJugador++;
-            if(tempsJugador<0||durada<tempsJugador){
-                tempsJugador=durada;
-                printf("Nou record.\n");
-            }
-        }
-
-        else if(guanyador==MAQUINA) {
-            victoriesMaquina++;
-            if(tempsMaquina<0||durada<tempsMaquina){
-                tempsMaquina=durada;
-                printf("Nou record.\n");
-            }
-        }
-        else empats++;
-
-        printf("\nDurada de la partida: %.0f segons\n", durada);
-
-        // Mostrar marcador
-        mostrarMarcador(numPartides,victoriesJugador,victoriesMaquina,empats,tempsJugador,tempsMaquina);
-
-        // Preguntar si vol jugar una altra
-        if (!demanaSiNo()) {break;}
-
-
-    }
-//    netejarPantalla();
-    printf("\nGracies per jugar!\n");
-    return 0;
-
-
-}*/
-
+}

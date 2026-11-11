@@ -62,7 +62,7 @@ double ferminimax(Node *p, int nivell, int *col);
 int ferminimax_arbre(char tauler[N][N]);
 
 /*PER EDITAR*/
-double funcioHeuristica();
+double funcioHeuristica(char tauler[N][N]);
 
 
 #endif // ARBRE_H_INCLUDED
