@@ -4,7 +4,7 @@
 
 #include "4 enratlla.h"
 
-/*DINS de "4 enratlla.h"
+/*//DINS de "4 enratlla.h"
 #define N 8
 #define BUIT ' '
 #define MAQUINA 'X'
@@ -105,7 +105,7 @@ void tirada(char tauler[N][N],int col,char fitxa){
 }
 */
 
-int tirada(char tauler[N][N],int col,char fitxa){
+int tirada2(char tauler[N][N],int col,char fitxa){
     if(!columnaValida(tauler,col)) return -1; //columna invalida
     //2.Calcular la fila on cau per gravetat
     for(int i=N-1;i>=0;i--){
@@ -383,7 +383,8 @@ char partida(char torn){
         }else{//torn maquina (ara demoment es el 2nd jugador
             printf("Maquina ('%c') ", torn);
             Posicio p;
-            p.col=tiradaMaquina_arbre(tauler);
+            p.col=demanaColumna(tauler);
+            //p.col=tiradaMaquina_arbre(tauler);
             //p.col=ferminimax_arbre(tauler);
             p.fila=tirada(tauler,p.col,MAQUINA);
             guanyat=ComprovaGuanyadorDesDe(tauler,MAQUINA,p,linia);
@@ -422,8 +423,8 @@ void mostrarMarcador(int numPartides, int victoriesJugador, int victoriesMaquina
 
 
 
-
-int main(){
+/*
+int main2(){
     int victoriesJugador=0;
     int victoriesMaquina=0;
     int empats=0;
@@ -470,5 +471,5 @@ int main(){
     return 0;
 
 
-}
+}*/
 

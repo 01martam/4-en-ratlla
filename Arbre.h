@@ -9,7 +9,7 @@
 //#define JUGADOR 'O'
 
 /*CONSTANTS*/
-#define PROFUNDITAT 2// nivells de l'arbre
+#define PROFUNDITAT 3// nivells de l'arbre
 #define INFINIT 1e9 // Variable de numero gran
 
 /*ESTRUCTURA*/

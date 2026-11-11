@@ -2,7 +2,7 @@
 #define ENRATLLA_H
 
 /*CONSTANTS*/
-#define N 8
+#define N 3
 #define BUIT ' '
 #define MAQUINA 'X'
 #define JUGADOR 'O'
@@ -55,7 +55,7 @@ void mostrarMarcador(int numPartides, int victoriesJugador, int victoriesMaquina
 char partida(char torn);
 
 /*FUNCIO HEURISTICA*/
-double funcioHeuristica(char tauler[N][N]);
+//double funcioHeuristica(char tauler[N][N]);
 
 
 
