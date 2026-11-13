@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "4 enratlla.h"
+#include "4_enratlla.h"
 #include "Arbre.h"
 
 /*//DINS de "4 enratlla.h"
