@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "4 enratlla.h"
+#include "4_enratlla.h"
 #include "Arbre.h"
 
 
@@ -29,7 +29,7 @@ int main(){
     char guanyador=0;//primera partida o empat
 
     while(1){
-        //decidir qui comença la partida
+        //decidir qui comenÃ§a la partida
         char torn=decideixTornInicial(guanyador);
 
         time_t inici=time(NULL);
@@ -41,12 +41,12 @@ int main(){
 
         if(guanyador==JUGADOR) {
             victoriesJugador++;
-            if(tempsJugador_millor<0||durada<tempsJugador_millor){ //el temps més curt
+            if(tempsJugador_millor<0||durada<tempsJugador_millor){ //el temps mÃ©s curt
                 tempsJugador_millor=durada;
                 printf("Nou record del JUGADOR:%.0fs.\n",durada);
             }
 
-            if(tempsJugador_pitjor<0||durada>=tempsJugador_pitjor){ //el temps més llarg
+            if(tempsJugador_pitjor<0||durada>=tempsJugador_pitjor){ //el temps mÃ©s llarg
                 tempsJugador_pitjor=durada;
             }
         }
