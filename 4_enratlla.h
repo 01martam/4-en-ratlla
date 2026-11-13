@@ -34,7 +34,7 @@ int Linia_Diagonal_dret(char tauler[N][N],char fitxa);
 int Linia_Diagonal_esq(char tauler[N][N],char fitxa);
 int ComprovarGuanyador(char tauler[N][N],char fitxa);
 
-/*REVISAR GUANYADOR DESDE LA POSICIÓ DE L'ÚLTIMA FITXA*/
+/*REVISAR GUANYADOR DESDE LA POSICIÃ“ DE L'ÃšLTIMA FITXA*/
 int Fitxa_Linia_Horitzontal(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]);
 int Fitxa_Linia_vertical(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]);
 int Fitxa_Linia_Diagonal_dret(char tauler[N][N], char fitxa,Posicio p, Posicio L[4]);
@@ -56,24 +56,6 @@ void mostrarMarcador(FILE *sortida,int numPartides, int victoriesJugador, int vi
 /*4 EN RATLLA*/
 char decideixTornInicial(char guanyadorAnterior);
 char partida(char torn,FILE *fitxer);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
