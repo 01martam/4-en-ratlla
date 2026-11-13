@@ -1,7 +1,7 @@
 #ifndef ARBRE_H
 #define ARBRE_H
 
-#include "4 enratlla.h"
+#include "4_enratlla.h"
 /*CONSTANTS propies del joc (dins de  "4 enratlla.h")*/
 //#define N 8
 //#define BUIT ' '
