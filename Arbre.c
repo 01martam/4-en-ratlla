@@ -19,7 +19,6 @@ typedef struct node {
 	double valor;
 }Node;
 */
-int comptador=0;//variable global
 
 /**FUNCIONS**/
 /**Funcions sobre el tauler**/
@@ -60,86 +59,10 @@ int numFillAColumna(char tauler[N][N],int numfill){
 
 //int tirada1(char tauler[N][N],int col,char fitxa){}
 
-
-//funció que calcular el valor de les fulles
-//double funcioHeuristica(char tauler[N][N]){//va en 4enratlla?
-//    // Per editar encara
-//    //return ((double)rand() / RAND_MAX) * 2.0 * INFINIT - INFINIT;
-//
-//    //return ++comptador;
-//}
-
-
-double avalua(char tauler[N][N], int fila, int col, int df, int dc) {
-    int countM = 0, countJ = 0;
-
-    // Comptar fitxes de la MÀQUINA i del JUGADOR a la finestra
-    for (int k = 0; k < 4; k++) {
-        int f = fila + k * df;
-        int c = col + k * dc;
-        if (tauler[f][c] == MAQUINA) countM++;
-        else if (tauler[f][c] == JUGADOR) countJ++;
-    }
-
-    // Si hi ha fitxes dels dos jugadors, la finestra no és útil
-    if (countM > 0 && countJ > 0) return 0;
-
-    // Només fitxes de la MÀQUINA (valors positius)
-    if (countM == 4) return 1000000;   // victòria
-    if (countM == 3) return 100;       // amenaça (3 en ratlla)
-    if (countM == 2) return 10;        // 2 en ratlla
-    if (countM == 1) return 1;         // 1 fitxa
-
-    // Només fitxes del JUGADOR (valors negatius)
-    if (countJ == 4) return -1000000;  // derrota
-    if (countJ == 3) return -100;      // amenaça del JUGADOR
-    if (countJ == 2) return -10;       // 2 en ratlla del JUGADOR
-    if (countJ == 1) return -1;        // 1 fitxa del JUGADOR
-
-    return 0;   // finestra buida
-}
-
-
-
-
-//Primer mira si de casualitat ha guanyat algu llavors son les opcions millor o pitjor
-double funcioHeuristica(char tauler[N][N]) {
-    //printf("Tauler a funcioHeuristica:\n");
-    //escriureTaulerFitxer(stdout,tauler);
-    if (ComprovarGuanyador(tauler, MAQUINA)) return INFINIT;
-    if (ComprovarGuanyador(tauler, JUGADOR)) return -INFINIT;
-    //return ((double)rand() / RAND_MAX) * 2.0 * 100 - 100;
-
-    double valor = 0;
-
-    // ─── Horitzontals ───
-    for (int i = 0; i < N; i++)
-        for (int j = 0; j <= N - 4; j++)
-            valor += avalua(tauler, i, j, 0, 1);
-
-    // ─── Verticals ───
-    for (int i = 0; i <= N - 4; i++)
-        for (int j = 0; j < N; j++)
-            valor += avalua(tauler, i, j, 1, 0);
-
-    // ─── Diagonal / ───
-    for (int i = 3; i < N; i++)
-        for (int j = 0; j <= N - 4; j++)
-            valor += avalua(tauler, i, j, -1, 1);
-
-    // ─── Diagonal \ ───
-    for (int i = 0; i <= N - 4; i++)
-        for (int j = 0; j <= N - 4; j++)
-            valor += avalua(tauler, i, j, 1, 1);
-
-    return valor;
-}
-
 /**Crear Arbre de nivell exactament 2**/
 //Crea un node fill a partir d’un pare
-Node *creaNode2(Node *pare, int numFill, int nivell) {
+Node *creaNode2(Node *pare, int numFill, int nivell, int dificultat) {
 	Node *p=malloc(sizeof(Node));
-	//p->valor=funcioHeuristica(pare->tauler);
 	//1.Copiar Tauler
 	copiarTauler(p->tauler,pare->tauler);
 	//2.Tirar la fitxa a la columna que toqui
@@ -156,7 +79,7 @@ Node *creaNode2(Node *pare, int numFill, int nivell) {
 	else {//es una fulla
 		p->n_fills=0;
 		p->fills=NULL;
-		p->valor=funcioHeuristica(p->tauler);//nomès en les fulles s'aplica
+		p->valor=funcioHeuristica(p->tauler,dificultat);//nomès en les fulles s'aplica
 
 	}
 	return p;
@@ -164,31 +87,32 @@ Node *creaNode2(Node *pare, int numFill, int nivell) {
 
 //Crea tots els fills d’un node cridant creaNode() per a cada i (columna 0..7).
 //El paràmetre nivell es passa a creaNode per decidir si el fill tindrà al seu torn fills.
-void creaFills2(Node *pare, int nivell) {
+void creaFills2(Node *pare, int nivell,int dificultat) {
 	for(int i=0;i<pare->n_fills;i++) {
-		pare->fills[i]=creaNode2(pare,i,nivell);
+		pare->fills[i]=creaNode2(pare,i,nivell,dificultat);
 	}
 }
 
 //Construeix un arbre de profunditat 2
-void creaArbre2(Node *arrel) {
-	creaFills2(arrel,1);	//creem el 1er nivell de l'arbre
+void creaArbre2(Node *arrel,int dificultat) {
+	creaFills2(arrel,1,dificultat);	//creem el 1er nivell de l'arbre
 	for(int i=0;i<arrel->n_fills;i++)
-		creaFills2(arrel->fills[i],2);
+		creaFills2(arrel->fills[i],2,dificultat);
 }
 
 
 /**Crear Arbre de nivell mallor o igual a 2**/
 //Crea un node fill a partir d’un pare
-Node *creaNode(Node *pare, int numFill, int nivell) {
+Node *creaNode(Node *pare, int numFill, int nivell,int dificultat) {
 	Node *p=malloc(sizeof(Node));
-	//p->valor=funcioHeuristica(pare->tauler);
+	//1.Copiar Tauler
 	copiarTauler(p->tauler,pare->tauler);
-
+    //2.Tirar la fitxa a la columna que toqui
+	// Determinem la fitxa segons el nivell (Nivell senars la maquina i parells el jugador)
 	char fitxa = (nivell % 2 == 1) ? MAQUINA : JUGADOR;
 	int col = numFillAColumna(p->tauler, numFill);
 	tirada(p->tauler,col,fitxa);
-
+    //3.Crear l'array de fills si n'ha de tenir
 	if (nivell<PROFUNDITAT) {
 		p->n_fills=calcularNumeroDeFills(p->tauler);
 
@@ -197,7 +121,7 @@ Node *creaNode(Node *pare, int numFill, int nivell) {
             p->valor=0;
 		}else{
             p->fills=NULL;
-            p->valor=funcioHeuristica(p->tauler);
+            p->valor=funcioHeuristica(p->tauler, dificultat);
 
 
 		}
@@ -205,7 +129,7 @@ Node *creaNode(Node *pare, int numFill, int nivell) {
 	else {
 		p->n_fills=0;
 		p->fills=NULL;
-		p->valor=funcioHeuristica(p->tauler);
+		p->valor=funcioHeuristica(p->tauler, dificultat);
 
 	}
 	return p;
@@ -213,18 +137,18 @@ Node *creaNode(Node *pare, int numFill, int nivell) {
 
 //Crea tots els fills d’un node cridant creaNode() per a cada i (columna 0..7).
 //El paràmetre nivell es passa a creaNode per decidir si el fill tindrà al seu torn fills.
-void creaFills(Node *pare, int nivell) {
+void creaFills(Node *pare, int nivell, int dificultat) {
 	for(int i=0;i<pare->n_fills;i++) {
-		pare->fills[i]=creaNode(pare,i,nivell);
+		pare->fills[i]=creaNode(pare,i,nivell,dificultat);
 	}
 }
 
 //Construeix un arbre de profunditat PROFUNDITAT de forma recursiva
-void creaArbreRec(Node *node, int nivell) {
+void creaArbreRec(Node *node, int nivell, int dificultat) {
     if (nivell >= PROFUNDITAT) return;
-    creaFills(node, nivell+1);
+    creaFills(node, nivell+1,dificultat);
     for (int i = 0; i < node->n_fills; i++)
-        creaArbreRec(node->fills[i], nivell + 1);
+        creaArbreRec(node->fills[i], nivell + 1,dificultat);
 }
 
 /**Recorre l'arbre**/
@@ -288,10 +212,9 @@ void esborraArbreRec(Node *arrel) {
         free(arrel->fills[i]);//allibera el fill
     }
     free(arrel->fills);//allibera l'array de fills
-    //arrel->fills=NULL;
-    //arrel->n_fills=0;
     //free(arrel); no fem aixo perque depen de com definim l'arrel en el main
 
+    //alliberem tots els fills de l'arrel i descendents i l'array fills de cadascun, però no alliberem l'arrel
 }
 
 
@@ -358,7 +281,7 @@ int tiradaMaquina(Node *arrel) {
 }
 
 //Funció que crea l'arbre i que calcula la columna a traves de fer minimax
-int tiradaMaquina_arbre(char tauler[N][N]) {
+int tiradaMaquina_arbre(char tauler[N][N],int dificultat) {
     //crear l'arrel
     Node *arrel = malloc(sizeof(Node));
     copiarTauler(arrel->tauler, tauler);
@@ -367,7 +290,7 @@ int tiradaMaquina_arbre(char tauler[N][N]) {
     arrel->valor = 0;
 
     //crear l'arbre
-    creaArbreRec(arrel, 0);
+    creaArbreRec(arrel, 0,dificultat);
 
     //Recorrem els fills per triar el millor
     double aux = -INFINIT;
@@ -384,7 +307,7 @@ int tiradaMaquina_arbre(char tauler[N][N]) {
     //arrel->valor = aux; no cal realment
 
     //esborrem l'arbre
-    esborraArbre(arrel);
+    esborraArbreRec(arrel);
     free(arrel);
 
     return col;
@@ -433,25 +356,260 @@ double ferminimax(Node *p, int nivell, int *col) {
         return aux;
     }
 }
+
 //Funcio que crea l'arbre per despres fer el minimax i alhora calcula la columna que necesita
-int ferminimax_arbre(char tauler[N][N]) {
+int ferminimax_arbre(char tauler[N][N], int dificultat) {
     Node *arrel = malloc(sizeof(Node));
     copiarTauler(arrel->tauler, tauler);
     arrel->n_fills = calcularNumeroDeFills(arrel->tauler);
     arrel->fills = malloc(arrel->n_fills * sizeof(Node *));
     arrel->valor = 0;
 
-    creaArbreRec(arrel, 0);
+    creaArbreRec(arrel, 0, dificultat);
 
     int col;
     ferminimax(arrel, 0, &col);   // ← nivell 0 (arrel), col s'omple
-    esborraArbre(arrel);
+    //ferminimax_poda(arrel, 0, &col,-INFINIT,+INFINIT);
+    esborraArbreRec(arrel);
     free(arrel);
 
     return col;
 }
 
 
+/**FUNCIÓ HEURISTICA**/
+//conta el numero de fitxes de cada tipus i calcula la resta
+double contarCadaTipus(char tauler[N][N]){
+    int countM = 0, countJ = 0;
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            if (tauler[i][j] == MAQUINA) countM++;
+            else if (tauler[i][j] == JUGADOR) countJ++;
+        }
+    }
+    return (double)(countM - countJ);
+}
+
+//Agafem les fitxes en posició  (fila, col), (fila+df, col+dc), (fila+2df, col+2dc), (fila+3df, col+3dc).
+//Avalua una finestre de 4 caselles en una direcció i li assigna un pes segons la quantitat de fitxes de cada tipus.
+//si el mode es diferent de 0, a més mirem els extrems (fila-df, col-df) i (fila+4df, col+4dc)
+double avalua(char tauler[N][N], int fila, int col, int df, int dc, int modo) {
+    int countM = 0, countJ = 0;
+
+    // Comptar fitxes
+    for (int k = 0; k < 4; k++) {
+        int f = fila + k * df;
+        int c = col + k * dc;
+        if (!dinsTauler(f, c)) return 0;
+        if (tauler[f][c] == MAQUINA) countM++;
+        else if (tauler[f][c] == JUGADOR) countJ++;
+    }
+
+    // Si hi ha fitxes dels dos, no és útil
+    if (countM > 0 && countJ > 0) return 0;
+
+    // Mode simple (avalua1)
+    if (modo == 0) {
+        if (countM == 4) return 1000000;
+        if (countM == 3) return 100;
+        if (countM == 2) return 10;
+        if (countM == 1) return 1;
+
+        if (countJ == 4) return -1000000;
+        if (countJ == 3) return -100;
+        if (countJ == 2) return -10;
+        if (countJ == 1) return -1;
+
+        return 0;
+    }
+    else{
+        // Mode avançat (avalua2)
+        // Comprovar extrems
+        int extrems = 0;
+        int f_inici = fila - df, c_inici = col - dc;
+        int f_fi = fila + 4 * df, c_fi = col + 4 * dc;
+
+        if (dinsTauler(f_inici, c_inici) && tauler[f_inici][c_inici] == BUIT) extrems++;
+        if (dinsTauler(f_fi, c_fi) && tauler[f_fi][c_fi] == BUIT) extrems++;
+
+        if (countM == 4) return 1000000;
+        if (countM == 3) {
+            if (extrems >= 2) return 10000;
+            if (extrems == 1) return 1000;
+            return 10;
+        }
+        if (countM == 2) {
+            if (extrems >= 2) return 100;
+            if (extrems == 1) return 10;
+            return 1;
+        }
+        if (countM == 1) return 1;
+
+        if (countJ == 4) return -1000000;
+        if (countJ == 3) {
+            if (extrems >= 2) return -10000;
+            if (extrems == 1) return -1000;
+            return -10;
+        }
+        if (countJ == 2) {
+            if (extrems >= 2) return -100;
+            if (extrems == 1) return -10;
+            return -1;
+        }
+        if (countJ == 1) return -1;
+
+        return 0;
+    }
+}
+
+//La suma dels pesos de avalua
+double sumaDelPesos(char tauler[N][N],int modo) {
+    double valor = 0;
+
+    // ─── Horitzontals ───
+    for (int i = 0; i < N; i++){
+        for (int j = 0; j <= N - 4; j++){
+            valor += avalua(tauler, i, j, 0, 1,modo);
+        }
+    }
+
+    // ─── Verticals ───
+    for (int i = 0; i <= N - 4; i++){
+        for (int j = 0; j < N; j++){
+            valor += avalua(tauler, i, j, 1, 0,modo);
+        }
+    }
+
+    // ─── Diagonal / ───
+    for (int i = 3; i < N; i++){
+        for (int j = 0; j <= N - 4; j++){
+            valor += avalua(tauler, i, j, -1, 1,modo);
+        }
+    }
+
+    // ─── Diagonal \ ───
+    for (int i = 0; i <= N - 4; i++){
+        for (int j = 0; j <= N - 4; j++){
+            valor += avalua(tauler, i, j, 1, 1,modo);
+        }
+    }
+
+    return valor;
+}
+
+
+double funcioHeuristica(char tauler[N][N],int dificultat){
+    if(dificultat==0){//totalment aleaotori
+        return ((double)rand() / RAND_MAX) * 2.0 * 1000 - 1000; //valors entre -1000 i 1000
+    }
+
+    //Ara primer mirem si hi ha jugades guanyadores o el tauler esta ple sense guanya
+    if (ComprovarGuanyador(tauler, MAQUINA)) return INFINIT;
+    if (ComprovarGuanyador(tauler, JUGADOR)) return -INFINIT;
+    if(taulerPle(tauler)) return 0; //empat
+    //Aleaotiri però evitant victories
+
+    // contem quantes fitxes hi ha de cada tipus
+    if(dificultat==1)return contarCadaTipus(tauler);
+    if(dificultat==2) return ((double)rand() / RAND_MAX) * 2.0 * 1000 - 1000; //valors entre -1000 i 1000
+    //Contem fitxes pero mirant de 4 en 4
+    if(dificultat==3)return sumaDelPesos(tauler,0);
+    //Contem fitxes pero mirant de 4 en 4, i a més mirem 2 fitxes més
+    if(dificultat>=4)return sumaDelPesos(tauler,1);
+
+}
+
+/*
+//Agafem les fitxes en posició  (fila, col), (fila+df, col+dc), (fila+2df, col+2dc), (fila+3df, col+3dc).
+//Avalua una finestre de 4 caselles en una direcció i li assigna un pes segons la quantitat de fitxes de cada tipus.
+//double avalua1(char tauler[N][N], int fila, int col, int df, int dc) {
+//    int countM = 0, countJ = 0;
+//
+//    // Comptar fitxes de la MÀQUINA i del JUGADOR a la finestra
+//    for (int k = 0; k < 4; k++) {
+//        int f = fila + k * df;
+//        int c = col + k * dc;
+//        if(!dinsTauler(f,c)) return 0;
+//        if (tauler[f][c] == MAQUINA) countM++;
+//        else if (tauler[f][c] == JUGADOR) countJ++;
+//    }
+//
+//    // Si hi ha fitxes dels dos jugadors, la finestra no és útil, ja que no podrà haber-hi 4 del mateix tipus.
+//    if (countM > 0 && countJ > 0) return 0;
+//
+//    // Només fitxes de la MÀQUINA (valors positius)
+//    if (countM == 4) return 1000000;   // victòria
+//    if (countM == 3) return 100;       // amenaça (3 en ratlla)
+//    if (countM == 2) return 10;        // 2 en ratlla
+//    if (countM == 1) return 1;         // 1 fitxa
+//
+//    // Només fitxes del JUGADOR (valors negatius)
+//    if (countJ == 4) return -1000000;  // derrota
+//    if (countJ == 3) return -100;      // amenaça del JUGADOR
+//    if (countJ == 2) return -10;       // 2 en ratlla del JUGADOR
+//    if (countJ == 1) return -1;        // 1 fitxa del JUGADOR
+//
+//    return 0;   // finestra buida
+//}
+//
+//
+////considera també els extrems (fila-df, col-df) i (fila+4df, col+4dc) a més de les 4 fitxes
+//double avalua2(char tauler[N][N], int fila, int col, int df, int dc) {
+//    int countM = 0, countJ = 0;
+//
+//    // Comptar fitxes
+//    for (int k = 0; k < 4; k++) {
+//        int f = fila + k * df;
+//        int c = col + k * dc;
+//        if(!dinsTauler(f,c)) return 0;
+//        if (tauler[f][c] == MAQUINA) countM++;
+//        else if (tauler[f][c] == JUGADOR) countJ++;
+//    }
+//
+//    // Si hi ha fitxes dels dos, no és útil
+//    if (countM > 0 && countJ > 0) return 0;
+//
+//    // Comprovar extrems (fila-df, col-df) i (fila+4df, col+4dc)
+//    int extrems = 0;
+//    int f_inici = fila - df, c_inici = col - dc;
+//    int f_fi = fila + 4 * df, c_fi = col + 4 * dc;
+//
+//    if (dinsTauler(f_inici,c_inici) &&tauler[f_inici][c_inici] == BUIT) extrems++;
+//    if (dinsTauler(f_fi,c_fi)&&tauler[f_fi][c_fi] == BUIT) extrems++;
+//
+//    // Valors segons fitxes i extrems oberts
+//    if (countM == 4) return 1000000;
+//    if (countM == 3) {
+//        if (extrems >= 2) return 10000;   // 3 obert (amenaça doble)
+//        if (extrems == 1) return 1000;    // 3 obert (amenaça simple)
+//        return 10;                               // 3 tancat (no es pot completar)
+//    }
+//    if (countM == 2) {
+//        if (extrems >= 2) return 100;
+//        if (extrems == 1) return 10;
+//        return 1;
+//    }
+//    if (countM == 1) return 1;
+//
+//    if (countJ == 4) return -1000000;
+//    if (countJ == 3) {
+//        if (extrems >= 2) return -10000;
+//        if (extrems == 1) return -1000;
+//        return -10;
+//    }
+//    if (countJ == 2) {
+//        if (extrems >= 2) return -100;
+//        if (extrems == 1) return -10;
+//        return -1;
+//    }
+//    if (countJ == 1) return -1;
+//
+//    return 0;
+//}
+*/
+
+
+/**Funció per veure que rep la funcio heuristica**/
 void recorreTaulersRecursiu(Node *p,int Nivell) {
     printf("Nivell %i:%.0f\n",Nivell,p->valor);
     escriureTaulerFitxer(stdout,p->tauler);
@@ -528,8 +686,9 @@ void tirada(char tauler[N][N],int numfill,char fitxa){
 /*MAIN-----------------------------------------------------------*/
 
 
-int main1() {
+int main4() {
     srand(123);
+    int dificultat =3;
 
     char tauler[N][N] = {
     {'O', ' ', ' ', ' ', ' ', ' ', 'X', ' '},   // fila 0
@@ -544,20 +703,17 @@ int main1() {
 
 
 
-
 	Node arrel;
-	arrel.valor=0;//valor posat pel recorreArbre
-	arrel.n_fills=calcularNumeroDeFills(tauler);
-	arrel.fills=malloc(arrel.n_fills*sizeof(Node *));
-	inicialitzarTauler(arrel.tauler);
-
+    inicialitzarTauler(arrel.tauler);
     copiarTauler(arrel.tauler,tauler);
 
-
+	arrel.valor=0;//valor posat pel recorreArbre
+	arrel.n_fills=calcularNumeroDeFills(arrel.tauler);
+	arrel.fills=malloc(arrel.n_fills*sizeof(Node *));
 
 
     //creaArbre(&arrel);
-	creaArbreRec(&arrel,0);
+	creaArbreRec(&arrel,0,dificultat);
 	//minimax 1 crida 2 funcions
 
 	//int col = tiradaMaquina_arbre(arrel.tauler);       // ← una sola crida
@@ -565,22 +721,27 @@ int main1() {
 	//int col = tiradaMaquina(&arrel);       // ← una sola crida
     //minimax(&arrel,0);
 	//crida minimax amb col
-	int col=-1;
-    double valor = ferminimax(&arrel,0, &col);   // ← col s'omple amb la millor columna
-    printf("Col=%i\n",col);
+	Posicio p;
+	p.col=-1;
+	dibuixarTauler(tauler,NULL);
+    double valor = ferminimax(&arrel,0, &p.col);   // ← col s'omple amb la millor columna
+    p.fila=tirada(tauler,p.col,MAQUINA);
+    printf("Col=%i (0-7)\n",p.col);
+    printf("fil=%i (0-7)\n",p.fila);
     printf("valor=%.0f\n",valor);
+    dibuixarTauler(tauler,NULL);
 
 
 // Ara col té la columna on la MÀQUINA ha de tirar
 	//recorreArbreRecursiu(&arrel,0);
 	//minimax(&arrel, 0);
-	recorreArbreRecursiu(&arrel,0);
+	//recorreArbreRecursiu(&arrel,0);
 
 	freopen("taulers.txt", "w", stdout);
     recorreTaulersRecursiu(&arrel,0);
     fclose(stdout);
     printf("\n\narrel.valor=%.0f\n\n\n",arrel.valor);
-	esborraArbre(&arrel);
+	esborraArbreRec(&arrel);
 	//free(arrel) si arrel fos dinamic
 
 	return 0;

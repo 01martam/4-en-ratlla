@@ -5,78 +5,83 @@
 #include "Arbre.h"
 
 
+void obtenirDataHora(char *buffer, int mida) {
+    time_t ara = time(NULL);
+    struct tm *info = localtime(&ara);
+    strftime(buffer, mida, "%d-%m-%Y_%H-%M.txt", info);
+}
+
+
 int main(){
-    srand(123);
-    int victoriesJugador=0;
-    int victoriesMaquina=0;
-    int empats=0;
+    //INICIALITZACIÓ
+    srand(time(NULL));
+    int victoriesJugador=0, victoriesMaquina=0, empats=0;
     int numPartides=0;
-    double tempsJugador_millor=-1;//sense record
-    double tempsJugador_pitjor=-1;//sense record
-    double tempsMaquina_millor=-1;
-    double tempsMaquina_pitjor=-1;
+    double tempsJugador_millor=-1,tempsJugador_pitjor=-1;//sense record
 
+    //FITXER de partides
+    int guardar= demanaSiNo("Vols guardar les partides en un fitxer?");
+    FILE *fitxerPartides=NULL;
 
-
-    // Obrir el fitxer de partides (afegint)
-    FILE *fitxerPartides = fopen("partides.txt", "a");
-    if (fitxerPartides == NULL) {
-        fprintf(stderr, "Error: no s'ha pogut obrir partides.txt\n");
-        return 1;
+    // Obtenir data i hora d'inici
+    char dataHora[64];
+    obtenirDataHora(dataHora, sizeof(dataHora));
+    // Obrir el fitxer de partides
+    if (guardar){
+        fitxerPartides = fopen(dataHora/*"Partides.txt"*/, "a");
+        if (fitxerPartides == NULL) fprintf(stderr, "Error: no s'ha pogut obrir _.txt\n");
     }
 
-
+    //PARTIDES
     char guanyador=0;//primera partida o empat
 
     while(1){
-        //decidir qui comenÃ§a la partida
+        //Decidir la dificultat de la partida actual
+        int dificultat= demanaDificultat();
+
+        //Decidir qui comença la partida
         char torn=decideixTornInicial(guanyador);
 
+        //Partida
         time_t inici=time(NULL);
-        guanyador=partida(torn,fitxerPartides);
+        guanyador=partida(torn,fitxerPartides,dificultat);
         time_t fi=time(NULL);
 
+        //Actualitzar MARCADOR
         double durada=(double)(fi-inici);
         numPartides++;
 
         if(guanyador==JUGADOR) {
             victoriesJugador++;
-            if(tempsJugador_millor<0||durada<tempsJugador_millor){ //el temps mÃ©s curt
+            if(tempsJugador_millor<0||durada<tempsJugador_millor){ //el temps més curt en guanyar el jugador
                 tempsJugador_millor=durada;
                 printf("Nou record del JUGADOR:%.0fs.\n",durada);
             }
 
-            if(tempsJugador_pitjor<0||durada>=tempsJugador_pitjor){ //el temps mÃ©s llarg
+            if(/*tempsJugador_pitjor<0||*/durada>tempsJugador_pitjor){ //el temps més llarg
                 tempsJugador_pitjor=durada;
             }
         }
 
-        else if(guanyador==MAQUINA) {
-            victoriesMaquina++;
-            if(tempsMaquina_millor<0||durada<tempsMaquina_millor){
-                tempsMaquina_millor=durada;
-                printf("Nou record de la MAQUINA:%.0fs.\n",durada);
-            }
-            if(tempsMaquina_pitjor<0||durada>=tempsMaquina_pitjor){
-                tempsMaquina_pitjor=durada;
-            }
-        }
+        else if(guanyador==MAQUINA) victoriesMaquina++;
+
         else empats++;
 
         printf("\nDurada de la partida: %.0f segons\n", durada);
 
         // Mostrar marcador
-        mostrarMarcador(stdout,numPartides,victoriesJugador,victoriesMaquina,empats,tempsJugador_millor,tempsMaquina_millor,tempsJugador_pitjor,tempsMaquina_pitjor);
+        mostrarMarcador(stdout,dificultat,numPartides,victoriesJugador,victoriesMaquina,empats,tempsJugador_millor,tempsJugador_pitjor);
 
         if (fitxerPartides != NULL) {
-            mostrarMarcador(fitxerPartides, numPartides, victoriesJugador, victoriesMaquina, empats,tempsJugador_millor, tempsMaquina_millor,tempsJugador_pitjor, tempsMaquina_pitjor);
+            printf("Partida guardada en %s\n",dataHora);
+            mostrarMarcador(fitxerPartides,dificultat,numPartides, victoriesJugador, victoriesMaquina, empats,tempsJugador_millor,tempsJugador_pitjor);
         }
         // Preguntar si vol jugar una altra
-        if (!demanaSiNo()) {break;}
+        if (!demanaSiNo("Vols jugar una altra partida?")) {break;}
 
 
     }
-    fclose(fitxerPartides);
+    if(fitxerPartides!=NULL) fclose(fitxerPartides);
 //    netejarPantalla();
     printf("\nGracies per jugar!\n");
     return 0;
