@@ -49,13 +49,12 @@ void netejarPantalla();
 void netejarPantalla2();
 
 /*MARCADOR*/
-void mostrarMarcador(int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador,double recordMaquina);
+void mostrarMarcador(int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador_MILLOR,double recordMaquina_MILLOR,double recordJugador_PITJOR,double recordMaquina_PITJOR);
 
 /*4 EN RATLLA*/
 char partida(char torn);
 
-/*FUNCIO HEURISTICA*/
-double funcioHeuristica(char tauler[N][N]);
+
 
 
 

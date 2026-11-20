@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//#include "1 vs 1.h"
+#include "Arbre.h"
 
-#define N 2
+/*DINS de "arbre.h"
+#define N 8
 #define BUIT ' '
 #define MAQUINA 'X'
 #define JUGADOR 'O'
-#define PROFUNDITAT 3// nivells de l'arbre
+#define PROFUNDITAT 4// nivells de l'arbre
 #define INFINIT 1e9 // Variable de numero gran
 
 typedef struct node {
@@ -16,38 +17,11 @@ typedef struct node {
 	int n_fills;
 	double valor;
 }Node;
-
+*/
 int comptador=0;//variable global
 
-/*FUNCIONS*/
-//funció que calcular el valor de les fulles
-/*int funcioHeuristica(){
-    // Per editar encara
-    return ++comptador;
-}*/
-
-double funcioHeuristica(char tauler[N][N]) {
-    int countM = 0, countJ = 0;
-
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            if (tauler[i][j] == MAQUINA) countM++;
-            else if (tauler[i][j] == JUGADOR) countJ++;
-        }
-    }
-
-    return countM - countJ;
-}
-
-//Omple el tauler amb BUIT
-void inicialitzarTauler(char tauler[N][N]) {// #include 1 vs 1.h
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            tauler[i][j] = BUIT;
-        }
-    }
-}
-
+/**FUNCIONS**/
+/**Funcions sobre el tauler**/
 // Copia el tauler del origen (pare) al desti(fill)
 void copiarTauler(char desti[N][N],char origen[N][N]){
     for(int i=0;i<N;i++){
@@ -56,13 +30,6 @@ void copiarTauler(char desti[N][N],char origen[N][N]){
         }
     }
 }
-
-// Comprova si la columna és vàlida (1 = sí, 0 = no)
-int columnaValida(char tauler[N][N], int col) {//#include 1 vs 1
-    if (col < 0 || col >= N) return 0;
-    return tauler[0][col] == BUIT; // Retorna 1 si la casella superior està buida
-}
-
 
 // Compta quantes columnes NO estan plenes, es a dir el numero de posibles jugades, les quals cadascuna sera un fill
 int calcularNumeroDeFills(char tauler[N][N]){
@@ -90,41 +57,18 @@ int numFillAColumna(char tauler[N][N],int numfill){
     return -1; // En cas d'error (no hauria d'arribar mai aquí si numFill és vàlid)
 }
 
-/*
-void tirada(char tauler[N][N],int numfill,char fitxa){
-    //1.Transformar el numfill a la columna matriu
-    int col = numFillAColumna(tauler,numfill);
-    if(!columnaValida(tauler,col)) return -1; //columna invalida
-    //2.Calcular la fila on cau per gravetat
-    for(int i=N-1;i>=0;i--){
-        //3.Posar la fitxa a la fila/columna
-        if(tauler[i][col]==BUIT){
-            tauler[i][col]=fitxa;
-            return;
-        }
-    }
+//int tirada1(char tauler[N][N],int col,char fitxa){}
 
-    //1.Transformar el numFill a columna de la matriu.
-	//2.Calcula la fila on cau per gravetat
-	//3.Posar la fitxa a la fila/columna calculada
-}
-*/
 
-// Fa caure una fitxa per gravetat a la columna corresponent
-int tirada(char tauler[N][N],int col,char fitxa){//#include 1 vs 1
-    if(!columnaValida(tauler,col)) return -1; //columna invalida
-    //2.Calcular la fila on cau per gravetat
-    for(int i=N-1;i>=0;i--){
-        //3.Posar la fitxa a la fila/columna
-        if(tauler[i][col]==BUIT){
-            tauler[i][col]=fitxa;
-            return i;
-        }
-    }
-    return -1; //columna plena
+//funció que calcular el valor de les fulles
+double funcioHeuristica(){//va en 4enratlla?
+    // Per editar encara
+    //return ((double)rand() / RAND_MAX) * 2.0 * INFINIT - INFINIT;
+    return ((double)rand() / RAND_MAX) * 2.0 * 100 - 100;
+    //return ++comptador;
 }
 
-/*Arbre de nomes 2 nivells----------------------------------------------*/
+/**Crear Arbre de nivell exactament 2**/
 //Crea un node fill a partir d’un pare
 Node *creaNode2(Node *pare, int numFill, int nivell) {
 	Node *p=malloc(sizeof(Node));
@@ -167,8 +111,8 @@ void creaArbre2(Node *arrel) {
 }
 
 
-
-/*Arbre de més de 2 nivells----------------------------------------------*/
+/**Crear Arbre de nivell mallor o igual a 2**/
+//Crea un node fill a partir d’un pare
 Node *creaNode(Node *pare, int numFill, int nivell) {
 	Node *p=malloc(sizeof(Node));
 	//p->valor=funcioHeuristica();
@@ -180,8 +124,16 @@ Node *creaNode(Node *pare, int numFill, int nivell) {
 
 	if (nivell<PROFUNDITAT) {
 		p->n_fills=calcularNumeroDeFills(p->tauler);
-		p->fills=malloc(p->n_fills * sizeof(Node *));
-		p->valor=0;//posa el minimax
+
+		if (p->n_fills>0){
+            p->fills=malloc(p->n_fills * sizeof(Node *));
+            p->valor=0;
+		}else{
+            p->fills=NULL;
+            p->valor=funcioHeuristica(p->tauler);
+
+
+		}
 	}
 	else {
 		p->n_fills=0;
@@ -192,24 +144,24 @@ Node *creaNode(Node *pare, int numFill, int nivell) {
 	return p;
 }
 
-//Es exactament la mateixa funcio que sense el plus pero com creo una nova creaNode la he de crear
+//Crea tots els fills d’un node cridant creaNode() per a cada i (columna 0..7).
+//El paràmetre nivell es passa a creaNode per decidir si el fill tindrà al seu torn fills.
 void creaFills(Node *pare, int nivell) {
 	for(int i=0;i<pare->n_fills;i++) {
 		pare->fills[i]=creaNode(pare,i,nivell);
 	}
 }
 
+//Construeix un arbre de profunditat PROFUNDITAT de forma recursiva
 void creaArbreRec(Node *node, int nivell) {
-    if (nivell > PROFUNDITAT) return;
-    creaFills(node, nivell);
+    if (nivell >= PROFUNDITAT) return;
+    creaFills(node, nivell+1);
     for (int i = 0; i < node->n_fills; i++)
         creaArbreRec(node->fills[i], nivell + 1);
 }
 
-
-
-//imprimeix cada fill de l'arrel i després els fills d'aquests fills.
-//iteratiu (nomes 2 nivells)
+/**Recorre l'arbre**/
+//imprimeix cada fill de l'arrel i després els fills d'aquests fills de forma iterativa (nomes 2 nivells)
 void recorreArbre(Node *arrel){//apuntador per evitar fer copiar encara que no editem
     for(int i=0;i<arrel->n_fills;i++){
         printf("%.0f\n",arrel->fills[i]->valor);
@@ -219,8 +171,7 @@ void recorreArbre(Node *arrel){//apuntador per evitar fer copiar encara que no e
     }
 }
 
-//imprimeix cada fill de l'arrel i després els fills d'aquests fills.
-//Recursiu (N nivells)
+//imprimeix cada fill de l'arrel i després els fills d'aquests fills de forma recursiva (N nivells).
 void recorreArbreRecursiu(Node *p,int Nivell){
     for(int k=0;k<Nivell;k++){printf("  ");}
     printf("%.0f\n",p->valor);
@@ -229,6 +180,7 @@ void recorreArbreRecursiu(Node *p,int Nivell){
     }
 }
 
+/**Esborra arbre**/
 // Esborra NOMÉS 1 node (sense els seus fills, que s'han d'haver esborrat abans)
 void esborraNode(Node *p) {
     if (p == NULL) return;
@@ -278,26 +230,14 @@ void esborraArbreRec(Node *arrel) {
 
 
 
-/*MINIMAX-----------------------------------------------------------------------*/
-////Funcio que calcular el màxim entre 2 valors
-//double max(double a,double b){
-//    return (a>b)?a:b;
-//}
-////Funcio que calcular el minim entre 2 valors
-//double min(double a, double b){
-//    return (a<b)?a:b;
-//}
-
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-
-//Funcio minimax
+/**MINIMAX**/
+//Funcio d'algoritme minimax
 double minimax(Node *p, int nivell) {
 	//Pas 1: comprovar si estem a les fulles ( és a dir al nivell maxim de l'arbre)
     if (p->n_fills == 0) {return p->valor;}
 
 	//Pas 2:Separar els casos en si estem fent maxim o minim
-    int esMaxim = (nivell % 2 == 1);
+    int esMaxim = (nivell % 2 == 0);
 	//Cas maxim
     if (esMaxim) {
         double aux = -INFINIT;
@@ -316,6 +256,21 @@ double minimax(Node *p, int nivell) {
         p->valor = aux;
         return aux;
     }
+    return p->valor;
+}
+
+//funció que recorre l'arbre per trobar el node que s'ha obtingut el minimax
+int millorColumna(Node *arrel) {
+
+    int nFill = 0;
+
+    for (int i = 1; i < arrel->n_fills; i++) {
+        if (arrel->fills[i]->valor > arrel->fills[nFill]->valor) {
+            nFill = i;
+        }
+    }
+
+    return numFillAColumna(arrel->tauler, nFill);
 }
 
 //Funció que calcula la columna a traves de fer minimax
@@ -335,20 +290,54 @@ int tiradaMaquina(Node *arrel) {
     return col;
 }
 
+//Funció que crea l'arbre i que calcula la columna a traves de fer minimax
+int tiradaMaquina_arbre(char tauler[N][N]) {
+    //crear l'arrel
+    Node *arrel = malloc(sizeof(Node));
+    copiarTauler(arrel->tauler, tauler);
+    arrel->n_fills = calcularNumeroDeFills(arrel->tauler);
+    arrel->fills = malloc(arrel->n_fills * sizeof(Node *));
+    arrel->valor = 0;
 
+    //crear l'arbre
+    creaArbreRec(arrel, 0);
+
+    //Recorrem els fills per triar el millor
+    double aux = -INFINIT;
+    int col = -1;
+
+    for (int i = 0; i < arrel->n_fills; i++) {
+        double v = minimax(arrel->fills[i], 1);   // ← crida minimax per cada fill
+        if (v > aux) {
+            aux = v;
+            col = numFillAColumna(arrel->tauler, i);
+        }
+    }
+
+    //arrel->valor = aux; no cal realment
+
+    //esborrem l'arbre
+    esborraArbre(arrel);
+    free(arrel);
+
+    return col;
+}
+
+//Funcio que far el minimax i alhora calcula la columna que necesita
 double ferminimax(Node *p, int nivell, int *col) {
     //Pas 1: comprovar si estem a les fulles ( és a dir al nivell maxim de l'arbre)
     if (p->n_fills == 0) {return p->valor;}
     //Pas 2:Separar els casos en si estem fent maxim o minim
-    int esMaxim = (nivell % 2 == 1);
-	int columna=-1;
+    int columna=-1;
+    int esMaxim = (nivell % 2 == 0);
+
     //Cas maxim
     if (esMaxim) {
         double aux = -INFINIT;
         //int columna = -1;
 
         for (int i = 0; i < p->n_fills; i++) {
-            double v = minimax(p->fills[i], nivell + 1, NULL);
+            double v = ferminimax(p->fills[i], nivell + 1, NULL);
             if (v > aux) {//calcular el maxim entre el valors i calcular la columna que es la jugada
                 aux = v;
                 if (col != NULL) {columna = numFillAColumna(p->tauler, i);}
@@ -361,13 +350,12 @@ double ferminimax(Node *p, int nivell, int *col) {
     }
     //Cas minim
     else {
-
         double aux = INFINIT;
         //int columna = -1;
 
         for (int i = 0; i < p->n_fills; i++) {
-            double v = minimax(p->fills[i], nivell + 1, NULL);
-            if (v < aux) {//calcular el maxim entre el valors i calcular la columna que es la jugada
+            double v = ferminimax(p->fills[i], nivell + 1, NULL);
+            if (v < aux) {//calcular el minim entre el valors i calcular la columna que es la jugada
                 aux = v;
                 if (col != NULL) {columna = numFillAColumna(p->tauler, i);}
             }
@@ -378,79 +366,102 @@ double ferminimax(Node *p, int nivell, int *col) {
         return aux;
     }
 }
+//Funcio que crea l'arbre per despres fer el minimax i alhora calcula la columna que necesita
+int ferminimax_arbre(char tauler[N][N]) {
+    Node *arrel = malloc(sizeof(Node));
+    copiarTauler(arrel->tauler, tauler);
+    arrel->n_fills = calcularNumeroDeFills(arrel->tauler);
+    arrel->fills = malloc(arrel->n_fills * sizeof(Node *));
+    arrel->valor = 0;
 
+    creaArbreRec(arrel, 0);
 
+    int col;
+    ferminimax(arrel, 0, &col);   // ← nivell 0 (arrel), col s'omple
+    esborraArbre(arrel);
+    free(arrel);
 
-/*Idea
-
-int actualitzaMax(double v, double *aux, int *col, int i, char tauler[N][N]) {
-    if (v > *aux) {
-        *aux = v;
-        //if (col != NULL) {
-            return numFillAColumna(tauler, i);
-        //}
-    }
-    return -1;   // no s'ha actualitzat
-}
-int actualitzaMin(double v, double *aux, int *col, int i, char tauler[N][N]) {
-    if (v < *aux) {
-        *aux = v;
-       // if (col != NULL) {
-            return numFillAColumna(tauler, i);
-        //}
-    }
-    return -1;   // no s'ha actualitzat
+    return col;
 }
 
 
-double minimax(Node *p, int nivell, int *col) {
-    // Cas base: fulla
-    if (p->n_fills == 0) {return p->valor;}
+void recorreTaulersRecursiu(Node *p,int Nivell) {
+    printf("Nivell %i:%.0f\n",Nivell,p->valor);
+    dibuixarTauler(p->tauler, NULL);
 
-    int esMaxim = (nivell % 2 == 1);
-	int columna=-1;
+    for (int i = 0; i < p->n_fills; i++){
+        recorreTaulersRecursiu(p->fills[i],Nivell+1);
+    }
+}
 
-    if (esMaxim) {
-        // MAX
-        double aux = -INFINIT;
-        //int columna = -1;
+//Omple el tauler amb BUIT
+//void inicialitzarTauler(char tauler[N][N]) {// #include 1 vs 1.h
+//    for (int i = 0; i < N; i++) {
+//        for (int j = 0; j < N; j++) {
+//            tauler[i][j] = BUIT;
+//        }
+//    }
+//}
 
-        for (int i = 0; i < p->n_fills; i++) {
-            double v = minimax(p->fills[i], nivell + 1, NULL);
-			int n= actualitzaMax(v,&aux,col,i,p->tauler);
-			if(n!=-1&&col==NUlL) columna=n;
+////Funcio que calcular el màxim entre 2 valors
+//double max(double a,double b){
+//    return (a>b)?a:b;
+//}
+////Funcio que calcular el minim entre 2 valors
+//double min(double a, double b){
+//    return (a<b)?a:b;
+//}
+
+//#define MAX(a, b) ((a) > (b) ? (a) : (b))
+//#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
+//minim es nivell senar
+//max es nivell parell
+
+// Comprova si la columna és vàlida (1 = sí, 0 = no)
+//int columnaValida(char tauler[N][N], int col) {//#include 1 vs 1
+//    if (col < 0 || col >= N) return 0;
+//    return tauler[0][col] == BUIT; // Retorna 1 si la casella superior està buida
+//}
+
+// Fa caure una fitxa per gravetat a la columna corresponent
+//int tirada(char tauler[N][N],int col,char fitxa){//#include 1 vs 1
+//    if(!columnaValida(tauler,col)) return -1; //columna invalida
+//    //2.Calcular la fila on cau per gravetat
+//    for(int i=N-1;i>=0;i--){
+//        //3.Posar la fitxa a la fila/columna
+//        if(tauler[i][col]==BUIT){
+//            tauler[i][col]=fitxa;
+//            return i;
+//        }
+//    }
+//    return -1; //columna plena
+//}
+/*
+void tirada(char tauler[N][N],int numfill,char fitxa){
+    //1.Transformar el numfill a la columna matriu
+    int col = numFillAColumna(tauler,numfill);
+    if(!columnaValida(tauler,col)) return -1; //columna invalida
+    //2.Calcular la fila on cau per gravetat
+    for(int i=N-1;i>=0;i--){
+        //3.Posar la fitxa a la fila/columna
+        if(tauler[i][col]==BUIT){
+            tauler[i][col]=fitxa;
+            return;
         }
-
-        p->valor = aux;
-        if (col != NULL) *col = columna;
-        return aux;
-    } else {
-        // MIN
-        double aux = INFINIT;
-        //int columna = -1;
-
-        for (int i = 0; i < p->n_fills; i++) {
-            double v = minimax(p->fills[i], nivell + 1, NULL);
-            int n= actualitzaMin(v,&aux,col,i,p->tauler);
-			if(n!=-1&&col==NUlL) columna=n;
-        }
-
-        p->valor = aux;
-        if (col != NULL) *col = columna;
-        return aux;
     }
+
+    //1.Transformar el numFill a columna de la matriu.
+	//2.Calcula la fila on cau per gravetat
+	//3.Posar la fitxa a la fila/columna calculada
 }
-
-
 */
-
-
-
 
 /*MAIN-----------------------------------------------------------*/
 
 
-int main() {
+int main2() {
+    srand(123);
 	Node arrel;
 	arrel.valor=0;//valor posat pel recorreArbre
 	arrel.n_fills=N;
@@ -458,19 +469,29 @@ int main() {
 	inicialitzarTauler(arrel.tauler);
 
     //creaArbre(&arrel);
-	creaArbreRec(&arrel,1);
+	creaArbreRec(&arrel,0);
 	//minimax 1 crida 2 funcions
-	//int col = tiradaMaquina(&arrel);       // ← una sola crida
 
+	//int col = tiradaMaquina_arbre(arrel.tauler);       // ← una sola crida
+
+	//int col = tiradaMaquina(&arrel);       // ← una sola crida
+    //minimax(&arrel,0);
 	//crida minimax amb col
-	//int col;
-    //double valor = ferminimax(arrel, 1, &col);   // ← col s'omple amb la millor columna
+	int col=-1;
+    double valor = ferminimax(&arrel,0, &col);   // ← col s'omple amb la millor columna
+    printf("Col=%i\n",col);
+    printf("valor=%.0f\n",valor);
+
 
 // Ara col té la columna on la MÀQUINA ha de tirar
 	//recorreArbreRecursiu(&arrel,0);
-	minimax(&arrel, 0);
+	//minimax(&arrel, 0);
 	recorreArbreRecursiu(&arrel,0);
-	printf("%f",arrel.valor);
+
+	freopen("taulers.txt", "w", stdout);
+    recorreTaulersRecursiu(&arrel,0);
+    fclose(stdout);
+    printf("\n\narrel.valor=%.0f\n\n\n",arrel.valor);
 	esborraArbre(&arrel);
 	//free(arrel) si arrel fos dinamic
 

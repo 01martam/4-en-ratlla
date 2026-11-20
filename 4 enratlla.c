@@ -4,7 +4,7 @@
 
 #include "4 enratlla.h"
 
-/*DINS de "4 enratlla.h"
+/*//DINS de "4 enratlla.h"
 #define N 8
 #define BUIT ' '
 #define MAQUINA 'X'
@@ -381,10 +381,11 @@ char partida(char torn){
             p.fila=tirada(tauler,p.col,JUGADOR);
             guanyat=ComprovaGuanyadorDesDe(tauler,JUGADOR,p,linia);
         }else{//torn maquina (ara demoment es el 2nd jugador
-            printf("Maquina ('%c') ", torn);
+            //printf("Maquina ('%c') ", torn);
             Posicio p;
-            p.col=tiradaMaquina_arbre(tauler);
-            //p.col=ferminimax_arbre(tauler);
+            //p.col=demanaColumna(tauler);
+            //p.col=tiradaMaquina_arbre(tauler);
+            p.col=ferminimax_arbre(tauler);
             p.fila=tirada(tauler,p.col,MAQUINA);
             guanyat=ComprovaGuanyadorDesDe(tauler,MAQUINA,p,linia);
         }
@@ -397,7 +398,7 @@ char partida(char torn){
 
     if (guanyat) {
         dibuixarTauler(tauler,linia);
-        printf("\nEnhorabona! El Jugador %s ('%c') ha guanyat!\n", ((torn == JUGADOR) ? "JUGADOR" : "MAQUINA"), torn);
+        printf("\n%s ('%c') ha guanyat!\n", ((torn == JUGADOR) ? "El JUGADOR" : "La MAQUINA"), torn);
         return torn;
     } else {
         dibuixarTauler(tauler,NULL);
@@ -408,22 +409,26 @@ char partida(char torn){
     return 0;
 }
 
-void mostrarMarcador(int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador,double recordMaquina) {
+void mostrarMarcador(int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador_MILLOR,double recordMaquina_MILLOR,double recordJugador_PITJOR,double recordMaquina_PITJOR) {
     printf("\n+---------------------------------------+\n");
     printf(" Partides jugades:     %d                \n", numPartides);
     printf(" Victories JUGADOR:    %d                \n", victoriesJugador);
     printf(" Victories MAQUINA:    %d                \n", victoriesMaquina);
     printf(" Empats:               %d                \n", empats);
-    printf(" Record JUGADOR:       %.0fs             \n", (recordJugador<0)?0.0:recordJugador);
-    printf(" Record MAQUINA:       %.0fs             \n", (recordMaquina<0)?0.0:recordMaquina);
+    printf("+----------------JUGADOR----------------+\n");
+    printf(" Millor temps:         %.0fs             \n", (recordJugador_MILLOR<0)?0.0:recordJugador_MILLOR);
+    printf(" Pitjor temps:         %.0fs             \n", (recordJugador_PITJOR<0)?0.0:recordJugador_PITJOR);
+    printf("+----------------MAQUINA----------------+\n");
+    printf(" Millor temps:         %.0fs             \n", (recordMaquina_MILLOR<0)?0.0:recordMaquina_MILLOR);
+    printf(" Pitjor temps:         %.0fs             \n", (recordMaquina_PITJOR<0)?0.0:recordMaquina_PITJOR);
     printf("+---------------------------------------+\n\n");
 
 }
 
 
 
-
-int main(){
+/*
+int main2(){
     int victoriesJugador=0;
     int victoriesMaquina=0;
     int empats=0;
@@ -470,5 +475,5 @@ int main(){
     return 0;
 
 
-}
+}*/
 
