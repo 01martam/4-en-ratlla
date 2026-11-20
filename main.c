@@ -4,14 +4,16 @@
 #include "4_enratlla.h"
 #include "Arbre.h"
 
-
 void obtenirDataHora(char *buffer, int mida) {
     time_t ara = time(NULL);
     struct tm *info = localtime(&ara);
     strftime(buffer, mida, "%d-%m-%Y_%H-%M.txt", info);
 }
 
-
+/*
+    char dataHora[64];
+    obtenirDataHora(dataHora, sizeof(dataHora));
+*/
 int main(){
     //INICIALITZACIÓ
     srand(time(NULL));
@@ -20,15 +22,11 @@ int main(){
     double tempsJugador_millor=-1,tempsJugador_pitjor=-1;//sense record
 
     //FITXER de partides
-    int guardar= demanaSiNo("Vols guardar les partides en un fitxer?");
     FILE *fitxerPartides=NULL;
 
-    // Obtenir data i hora d'inici
-    char dataHora[64];
-    obtenirDataHora(dataHora, sizeof(dataHora));
-    // Obrir el fitxer de partides
-    if (guardar){
-        fitxerPartides = fopen(dataHora/*"Partides.txt"*/, "a");
+    // Obrir el fitxer de partides (si hem dit si)
+    if (demanaSiNo("Vols guardar les partides en un fitxer?")){
+        fitxerPartides = fopen("Partides.txt", "a");
         if (fitxerPartides == NULL) fprintf(stderr, "Error: no s'ha pogut obrir _.txt\n");
     }
 
@@ -36,6 +34,7 @@ int main(){
     char guanyador=0;//primera partida o empat
 
     while(1){
+        netejarPantalla();
         //Decidir la dificultat de la partida actual
         int dificultat= demanaDificultat();
 
@@ -73,7 +72,7 @@ int main(){
         mostrarMarcador(stdout,dificultat,numPartides,victoriesJugador,victoriesMaquina,empats,tempsJugador_millor,tempsJugador_pitjor);
 
         if (fitxerPartides != NULL) {
-            printf("Partida guardada en %s\n",dataHora);
+            printf("Partida guardada en Partides.txt\n");
             mostrarMarcador(fitxerPartides,dificultat,numPartides, victoriesJugador, victoriesMaquina, empats,tempsJugador_millor,tempsJugador_pitjor);
         }
         // Preguntar si vol jugar una altra
@@ -82,7 +81,7 @@ int main(){
 
     }
     if(fitxerPartides!=NULL) fclose(fitxerPartides);
-//    netejarPantalla();
+    netejarPantalla();
     printf("\nGracies per jugar!\n");
     return 0;
 

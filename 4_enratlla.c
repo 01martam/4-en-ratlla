@@ -401,21 +401,22 @@ int demanaDificultat(){
     int dificultat;
     char *nomsDificultat[] = {
         "Aleatoria",
-        "Comptar fitxes",
         "Aleatoria + victories",
+        "Comptar fitxes",
+        "Comptar fitxes resp Centre",
         "4 simples",
         "4 simples +2"
     };
-    for(int i =0;i<5;i++) printf("  %i - %s\n",i,nomsDificultat[i]);
+    for(int i =0;i<6;i++) printf("  %i - %s\n",i,nomsDificultat[i]);
     while (1) {
-        printf("Tria dificultat (0-4):\n ");
+        printf("Tria dificultat (0-5): ");
         if (scanf("%d", &dificultat) != 1) {
             while (getchar() != '\n');
             printf("Entrada no valida.(Han de ser numeros)\n");
             continue;
         }
-        if (dificultat >= 0 && dificultat <= 4) return dificultat;
-        printf("Dificultat no valida. Ha de ser 0-4.\n");
+        if (dificultat >= 0 && dificultat <= 5) return dificultat;
+        printf("Dificultat no valida. Ha de ser 0-5.\n");
     }
 }
 
@@ -538,8 +539,9 @@ void mostrarMarcador(FILE *sortida,int dificultat,int numPartides, int victories
     // Noms de les dificultats
     char *nomsDificultat[] = {
         "Aleatoria",
-        "Comptar fitxes",
         "Aleatoria + victories",
+        "Comptar fitxes",
+        "Comptar fitxes resp Centre",
         "4 simples",
         "4 simples +2"
     };

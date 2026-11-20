@@ -22,7 +22,7 @@ typedef struct node {
 /*MAXIM I MINIM*/
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
-
+#define ABS(a) ((a)>=0? (a):-(a))
 
 /*SOBRE EL TAULER*/
 void copiarTauler(char desti[N][N],char origen[N][N]);
@@ -61,6 +61,7 @@ int ferminimax_arbre(char tauler[N][N],int dificultat);
 
 /*FUNCIÓ HEURISTICA*/
 double contarCadaTipus(char tauler[N][N]);
+double contarCadaTipusCentre(char tauler[N][N]);
 double avalua(char tauler[N][N], int fila, int col, int df, int dc, int modo);
 double sumaDelPesos(char tauler[N][N],int modo);
 double funcioHeuristica(char tauler[N][N],int dificultat);
