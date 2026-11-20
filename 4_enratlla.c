@@ -86,19 +86,12 @@ int columnaValida(char tauler[N][N], int col) {
     else return 0;*/
 }
 
-// Comprova si el tauler està ple (1 = ple, 0 = encara hi ha lloc)
-/*int taulerPle(char tauler[N][N]) {
-    for (int j = 0; j < N; j++) {
-        if (tauler[0][j] == BUIT) return 0;
-    }
-    return 1;
-}*/
-
 // Comprova si una casella és dins del tauler
 int dinsTauler(int fila, int col) {
     return fila >= 0 && fila < N && col >= 0 && col < N;
 }
 
+// Comprova si el tauler està ple (1 = ple, 0 = encara hi ha lloc)
 int taulerPle(char tauler[N][N]) {
     for (int j = 0; j < N; j++) {
         if (columnaValida(tauler,j)) return 0;
@@ -350,7 +343,7 @@ int Fitxa_Linia(char tauler[N][N], char fitxa, Posicio p, int df, int dc, Posici
 //      x
 //       x
 
-//Si en alguna direcció hi ha 4 o més fitxes seguides (comptant la fitxa nova), hi ha guanyador.
+//Funció que comprova des de la posició de l'ultima tirada si hi ha linia guanyadora.
 int ComprovaGuanyadorDesDe(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]) {
 //    return Fitxa_Linia_Horitzontal(tauler,fitxa,p,L)||
 //           Fitxa_Linia_vertical(tauler,fitxa,p,L)||
@@ -369,18 +362,20 @@ int ComprovaGuanyadorDesDe(char tauler[N][N], char fitxa,Posicio p,Posicio L[4])
 int demanaColumna(char tauler[N][N]) {
     int col;
     while (1) {
-        printf("Tria columna (1-%d): ", N);
-        if (scanf("%d", &col) != 1) {
-            while (getchar() != '\n');
-            printf("Entrada no valida.(Han de ser numeros)");
-            continue;
-        }
-        col--;   // 1-N → 0-(N-1)
-
-        if(col<0||col>=N) {
-            printf("Columna no valida. ");
-            continue;
-        }
+//        printf("Tria columna (1-%d): ", N);
+//        if (scanf("%d", &col) != 1) {
+//            while (getchar() != '\n');
+//            printf("Entrada no valida.(Han de ser numeros)");
+//            continue;
+//        }
+//        col--;   // 1-N → 0-(N-1)
+//
+//        if(col<0||col>=N) {
+//            printf("Columna no valida. ");
+//            continue;
+//        }
+        col=demanaNumero(1,N);
+        col--;
 
         if (tauler[0][col] != BUIT) {//Columna plena
             printf("Columna plena. ");
@@ -393,30 +388,6 @@ int demanaColumna(char tauler[N][N]) {
 //            continue;
 //        }
         return col;
-    }
-}
-
-//Funció que demana a l'usuari quin tipus de funció heuristica vol usar.
-int demanaDificultat(){
-    int dificultat;
-    char *nomsDificultat[] = {
-        "Aleatoria",
-        "Aleatoria + victories",
-        "Comptar fitxes",
-        "Comptar fitxes resp Centre",
-        "4 simples",
-        "4 simples +2"
-    };
-    for(int i =0;i<6;i++) printf("  %i - %s\n",i,nomsDificultat[i]);
-    while (1) {
-        printf("Tria dificultat (0-5): ");
-        if (scanf("%d", &dificultat) != 1) {
-            while (getchar() != '\n');
-            printf("Entrada no valida.(Han de ser numeros)\n");
-            continue;
-        }
-        if (dificultat >= 0 && dificultat <= 5) return dificultat;
-        printf("Dificultat no valida. Ha de ser 0-5.\n");
     }
 }
 
@@ -437,6 +408,96 @@ int demanaSiNo(char *pregunta) {
     }
 }
 
+//Funcio que demana al usuari un valor entre min a max
+int demanaNumero(int min, int max) {
+    int num;
+    while (1) {
+        printf("Tria (%d-%d): ", min,max);
+        if (scanf("%d", &num) != 1) {
+            while (getchar() != '\n');
+            printf("Entrada no vàlida.(han de ser numeros)\n");
+            continue;
+        }
+        while (getchar() != '\n');
+        if (num >= min && num <= max) return num;
+        printf("Opció no vàlida. Ha de ser %d-%d.\n", min, max);
+    }
+}
+
+//Funció que demana a l'usuari quin tipus de funció heuristica vol usar(dificultat de la maquina).
+int demanaDificultat(int dificultatActual){
+    printf("\n=== CANVIAR DIFICULTAT ===\n");
+    printf("Dificultat actual: %d\n", dificultatActual);
+//    int dificultat;
+    const char *nomsDificultat[]=NOMS_DIFICULTAT;
+
+    for(int i =0;i<6;i++) printf("  %i - %s\n",i,nomsDificultat[i]);
+
+    return demanaNumero(0,5);
+//    while (1) {
+//        printf("Tria dificultat: ");
+//        if (scanf("%d", &dificultat) != 1) {
+//            while (getchar() != '\n');
+//            printf("Entrada no valida.(Han de ser numeros)\n");
+//            continue;
+//        }
+//        if (dificultat >= 0 && dificultat <= 5) return dificultat;
+//        printf("Dificultat no valida. Ha de ser 0-5.\n");
+//    }
+}
+
+int Menu(int dificultat,int guardar){
+
+    printf("\n=== MENU PRINCIPAL ===\n");
+    printf("1. Jugar partida\n");
+    printf("2. Veure records\n");
+    printf("3. Veure instruccions\n");
+    printf("4. Canviar dificultat (Actualment %i)\n",dificultat);
+    printf("5. Configurar guardar partides (Actualment %s es guarda)\n",(guardar)?"SI":"NO");
+    printf("6. Sortir\n");
+
+    return demanaNumero(1,6);
+//    int opcio;
+//    while (1) {
+//        printf("Tria una opcio: ");
+//        if (scanf("%d", &opcio) != 1) {
+//            while (getchar() != '\n');
+//            printf("Entrada no valida.(Han de ser numeros)\n");
+//            continue;
+//        }
+//        if (opcio >= 1 && opcio <= 6) return opcio;
+//        printf("Opcio no valida. Ha de ser 1-6.\n");
+//    }
+}
+
+
+
+int configurarFitxer(FILE **fitxerPartides) {
+    if (*fitxerPartides == NULL) {
+        // No hi ha fitxer obert → preguntar si vol obrir-lo
+        if (demanaSiNo("Vols guardar un historial de les partides en un fitxer?")) {
+            *fitxerPartides = fopen("Partides.txt", "a");
+            if (*fitxerPartides == NULL) {
+                fprintf(stderr, "Error: no s'ha pogut obrir Partides.txt\n");
+                return 0;
+            } else {
+                printf("Les partides es guardaran a Partides.txt.\n");
+                return 1;
+            }
+        }
+    } else {
+        // Ja hi ha un fitxer obert → preguntar si vol tancar-lo
+        if (demanaSiNo("Vols deixar de guardar l'historial de partides?")) {
+            fclose(*fitxerPartides);
+            *fitxerPartides = NULL;
+            printf("Ja no guardem les partides.\n");
+            return 0;
+        }
+    }
+}
+
+
+
 
 
 /**Neteja la pantalla**/
@@ -449,7 +510,7 @@ void netejarPantalla() {
     #endif
 }
 
-/**Qui comença**/
+/**4 en ratlla**/
 //Funció que decideix qui comença la partida següent segons qui guanya l'anterior, o aleatori si es empat
 char decideixTornInicial(char guanyadorAnterior) {
     char tornInicial;
@@ -463,7 +524,7 @@ char decideixTornInicial(char guanyadorAnterior) {
     return tornInicial;
 }
 
-/**4 en ratlla**/
+
 //Funció que reprodueix una partida del 4 en ratlla
 char partida(char torn,FILE *fitxer,int dificultat){
     char tauler[N][N];
@@ -533,27 +594,91 @@ char partida(char torn,FILE *fitxer,int dificultat){
 }
 
 
-/**Mostrar resultats**/
-void mostrarMarcador(FILE *sortida,int dificultat,int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador_MILLOR,double recordJugador_PITJOR) {
+//Funció que mostra el numero de partides i quantes ha guanyat cadascú, la dificultat de la funció heurística, i el millor i pitjor temps del jugador quan guanya
+void mostrarMarcador(FILE *sortida,int numPartides, int victoriesJugador, int victoriesMaquina,
+                     double recordJugador_MILLOR,double recordJugador_PITJOR,int ratxaJugador,int ratxaMaximaJugador) {
 
     // Noms de les dificultats
-    char *nomsDificultat[] = {
-        "Aleatoria",
-        "Aleatoria + victories",
-        "Comptar fitxes",
-        "Comptar fitxes resp Centre",
-        "4 simples",
-        "4 simples +2"
-    };
 
-    fprintf(sortida,"\n+---------------------------------------+\n");
+    fprintf(sortida,"\n+-------------------RECORDS------------------------+\n");
     fprintf(sortida," Partides jugades:     %d                \n", numPartides);
     fprintf(sortida," Victories JUGADOR:    %d                \n", victoriesJugador);
     fprintf(sortida," Victories MAQUINA:    %d                \n", victoriesMaquina);
-    fprintf(sortida," Empats:               %d                \n", empats);
-    fprintf(sortida," Dificultat MAQUINA:   %d (%s)           \n", dificultat,nomsDificultat[dificultat]);
-    fprintf(sortida,"+----------------JUGADOR----------------+\n");
+    fprintf(sortida," Empats:               %d                \n", numPartides - victoriesJugador - victoriesMaquina);
+    fprintf(sortida,"+---------------------------------------------------+\n");
     fprintf(sortida," Millor temps:         %.0fs             \n", (recordJugador_MILLOR<0)?0.0:recordJugador_MILLOR);
     fprintf(sortida," Pitjor temps:         %.0fs             \n", (recordJugador_PITJOR<0)?0.0:recordJugador_PITJOR);
-    fprintf(sortida,"+---------------------------------------+\n\n");
+    fprintf(sortida," Ratio Victories:      %.1f%%             \n", (numPartides > 0)? (100.0 * victoriesJugador / numPartides) : 0.0);
+    fprintf(sortida," Ratxa actual:         %d victories seguides\n", ratxaJugador);
+    fprintf(sortida," Maxima Ratxa:         %d victories seguides\n", ratxaMaximaJugador);
+    fprintf(sortida,"+-------------------------------------------------+\n\n");
 }
+
+
+
+
+
+
+
+
+void Jugar(FILE **fitxerPartides,char *guanyador, int *dificultat,int *numPartides, int *victoriesJugador, int *victoriesMaquina,double *tempsJugador_millor,double *tempsJugador_pitjor,int *ratxaJugador,int *ratxaMaximaJugador){
+    const char *nomsDificultat[]=NOMS_DIFICULTAT;
+    while(1){
+        netejarPantalla();
+
+        //Decidir qui comença la partida
+        char torn=decideixTornInicial(*guanyador);
+
+        //Partida
+        time_t inici=time(NULL);
+        *guanyador=partida(torn,*fitxerPartides,*dificultat);
+        time_t fi=time(NULL);
+
+        //Actualitzar MARCADOR
+        double durada=(double)(fi-inici);
+        (*numPartides)++;
+
+        if(*guanyador==JUGADOR) {
+            (*victoriesJugador)++;
+            (*ratxaJugador)++;
+            *ratxaMaximaJugador = MAX(*ratxaMaximaJugador, *ratxaJugador);
+            if(*tempsJugador_millor<0||durada<*tempsJugador_millor){ //el temps més curt en guanyar el jugador
+                *tempsJugador_millor=durada;
+                printf("Nou record del JUGADOR:%.0fs.\n",durada);
+            }
+
+            if(/* *tempsJugador_pitjor<0||*/durada>*tempsJugador_pitjor){ //el temps més llarg
+                *tempsJugador_pitjor=durada;
+            }
+        }
+
+        else if(*guanyador==MAQUINA) {
+                (*victoriesMaquina)++;
+                *ratxaJugador=0;
+        }
+
+        else {
+            //empats
+            *ratxaJugador=0;
+        }
+
+
+        printf("\nDurada de la partida: %.0f segons\n", durada);
+
+        // Mostrar marcador
+        printf("Dificultat MAQUINA Actual: %d (%s)\n\n", *dificultat,nomsDificultat[*dificultat]);
+        mostrarMarcador(stdout,*numPartides,*victoriesJugador,*victoriesMaquina,*tempsJugador_millor,*tempsJugador_pitjor,*ratxaJugador,*ratxaMaximaJugador);
+        if (*fitxerPartides != NULL) {
+            printf("Partida guardada en Partides.txt\n");
+            fprintf(*fitxerPartides,"Dificultat MAQUINA Actual: %d (%s)\n\n", *dificultat,nomsDificultat[*dificultat]);
+            mostrarMarcador(*fitxerPartides,*numPartides, *victoriesJugador, *victoriesMaquina,*tempsJugador_millor,*tempsJugador_pitjor,*ratxaJugador,*ratxaMaximaJugador);
+
+        }
+        // Preguntar si vol jugar una altra
+        if (!demanaSiNo("Vols jugar una altra partida amb la configuracio actual?")) {break;}
+
+
+    }
+
+}
+

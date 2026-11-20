@@ -9,34 +9,121 @@ void obtenirDataHora(char *buffer, int mida) {
     struct tm *info = localtime(&ara);
     strftime(buffer, mida, "%d-%m-%Y_%H-%M.txt", info);
 }
-
 /*
     char dataHora[64];
     obtenirDataHora(dataHora, sizeof(dataHora));
 */
+
+
+
+
+
+
 int main(){
     //INICIALITZACIÓ
     srand(time(NULL));
-    int victoriesJugador=0, victoriesMaquina=0, empats=0;
+    const char *nomsDificultat[]=NOMS_DIFICULTAT;
+    int victoriesJugador=0, victoriesMaquina=0;  //nombre de partides guanyades en general
     int numPartides=0;
+    //empats= numPartides-victoriesJugador-victoriesMaquina
+    int ratxaJugador=0,ratxaMaximaJugador=0;// nombre de partides guanyades seguides
     double tempsJugador_millor=-1,tempsJugador_pitjor=-1;//sense record
+
+    char guanyador=0;//primera partida o empat , els altres valors son MAQUINA o JUGADOR
+    int dificultat=5;// dificultat per defecte
+
+
+    //FITXER de partides
+    FILE *fitxerPartides=NULL;
+    int guardar=0;
+
+//    int guardar=demanaSiNo("Vols guardar un historial de les partides en un fitxer?");
+//    // Obrir el fitxer de partides (si hem dit si)
+//    if (guardar){
+//        fitxerPartides = fopen("Partides.txt", "a");
+//        if (fitxerPartides == NULL) fprintf(stderr, "Error: no s'ha pogut obrir _.txt\n");
+//    }
+
+    while(1){
+        //netejarPantalla();
+        int opcio=Menu(dificultat,guardar);
+        netejarPantalla();
+
+        if(opcio==1){
+            Jugar(&fitxerPartides, &guanyador, &dificultat, &numPartides,
+                      &victoriesJugador, &victoriesMaquina,
+                      &tempsJugador_millor, &tempsJugador_pitjor,
+                      &ratxaJugador, &ratxaMaximaJugador);
+            netejarPantalla();
+
+        }
+        else if(opcio==2){
+            //netejarPantalla();
+            mostrarMarcador(stdout, numPartides, victoriesJugador,
+                            victoriesMaquina, tempsJugador_millor, tempsJugador_pitjor,
+                            ratxaJugador, ratxaMaximaJugador);
+             printf(" Dificultat MAQUINA Actual: %d (%s)\n\n", dificultat,nomsDificultat[dificultat]);
+
+        }
+        else if (opcio==3){
+            //netejarPantalla();
+            printf("\n=== INSTRUCCIONS ===\n");
+            printf("El joc consisteix a aconseguir 4 fitxes seguides\n en linia horitzontal, vertical o diagonal.\n\n");
+            printf("- Les teves fitxes son " BLAU "%c" RESET ".\n",JUGADOR);
+            printf("- Les de la MAQUINA son " VERMELL "%c" RESET ".\n",MAQUINA);
+            printf("- Per tirar, escriu un numero de columna (1-8).\n");
+            printf("- La fitxa caura per gravetat.\n\n");
+        }
+        else if(opcio==4){
+            //netejarPantalla();
+            dificultat=demanaDificultat(dificultat);
+            netejarPantalla();
+        }
+        else if (opcio==5){
+            guardar=configurarFitxer(&fitxerPartides);
+        }
+        else if(opcio==6){
+            if (fitxerPartides != NULL) fclose(fitxerPartides);
+            netejarPantalla();
+            printf("\nGracies per jugar!\n");
+            return 0;
+        }
+
+    }
+}
+
+
+
+
+//Versio anterior
+int main2(){
+    //INICIALITZACIÓ
+    srand(time(NULL));
+    const char *nomsDificultat[]=NOMS_DIFICULTAT;
+    int victoriesJugador=0, victoriesMaquina=0;  //nombre de partides guanyades en general
+    int numPartides=0;
+    //empats= numPartides-victoriesJugador-victoriesMaquina
+    int ratxaJugador=0,ratxaMaximaJugador=0;// nombre de partides guanyades seguides
+    double tempsJugador_millor=-1,tempsJugador_pitjor=-1;//sense record
+
+    char guanyador=0;//primera partida o empat
+    int dificultat=4;// dificultat per defecte
 
     //FITXER de partides
     FILE *fitxerPartides=NULL;
 
     // Obrir el fitxer de partides (si hem dit si)
-    if (demanaSiNo("Vols guardar les partides en un fitxer?")){
+    if (demanaSiNo("Vols guardar un historial de les partides en un fitxer?")){
         fitxerPartides = fopen("Partides.txt", "a");
         if (fitxerPartides == NULL) fprintf(stderr, "Error: no s'ha pogut obrir _.txt\n");
     }
 
-    //PARTIDES
-    char guanyador=0;//primera partida o empat
+    //PARTIDES ->Jugar()
 
     while(1){
         netejarPantalla();
         //Decidir la dificultat de la partida actual
-        int dificultat= demanaDificultat();
+        dificultat= demanaDificultat(dificultat);
 
         //Decidir qui comença la partida
         char torn=decideixTornInicial(guanyador);
@@ -52,6 +139,8 @@ int main(){
 
         if(guanyador==JUGADOR) {
             victoriesJugador++;
+            ratxaJugador++;
+            ratxaMaximaJugador = MAX(ratxaMaximaJugador, ratxaJugador);
             if(tempsJugador_millor<0||durada<tempsJugador_millor){ //el temps més curt en guanyar el jugador
                 tempsJugador_millor=durada;
                 printf("Nou record del JUGADOR:%.0fs.\n",durada);
@@ -62,24 +151,37 @@ int main(){
             }
         }
 
-        else if(guanyador==MAQUINA) victoriesMaquina++;
+        else if(guanyador==MAQUINA) {
+                victoriesMaquina++;
+                ratxaJugador=0;
+        }
 
-        else empats++;
+        else {
+            //empats
+            ratxaJugador=0;
+        }
+
+
 
         printf("\nDurada de la partida: %.0f segons\n", durada);
 
         // Mostrar marcador
-        mostrarMarcador(stdout,dificultat,numPartides,victoriesJugador,victoriesMaquina,empats,tempsJugador_millor,tempsJugador_pitjor);
+        printf("Dificultat MAQUINA Actual: %d (%s)\n\n", dificultat,nomsDificultat[dificultat]);
+        mostrarMarcador(stdout,numPartides,victoriesJugador,victoriesMaquina,tempsJugador_millor,tempsJugador_pitjor,ratxaJugador,ratxaMaximaJugador);
 
         if (fitxerPartides != NULL) {
+            fprintf(fitxerPartides,"Dificultat MAQUINA Actual: %d (%s)\n\n", dificultat,nomsDificultat[dificultat]);
             printf("Partida guardada en Partides.txt\n");
-            mostrarMarcador(fitxerPartides,dificultat,numPartides, victoriesJugador, victoriesMaquina, empats,tempsJugador_millor,tempsJugador_pitjor);
+            mostrarMarcador(fitxerPartides,numPartides, victoriesJugador, victoriesMaquina,tempsJugador_millor,tempsJugador_pitjor,ratxaJugador,ratxaMaximaJugador);
+
         }
         // Preguntar si vol jugar una altra
         if (!demanaSiNo("Vols jugar una altra partida?")) {break;}
 
 
     }
+    //PARTIDES FI
+
     if(fitxerPartides!=NULL) fclose(fitxerPartides);
     netejarPantalla();
     printf("\nGracies per jugar!\n");
