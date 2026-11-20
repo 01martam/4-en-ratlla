@@ -4,15 +4,6 @@
 #include "4_enratlla.h"
 #include "Arbre.h"
 
-void obtenirDataHora(char *buffer, int mida) {
-    time_t ara = time(NULL);
-    struct tm *info = localtime(&ara);
-    strftime(buffer, mida, "%d-%m-%Y_%H-%M.txt", info);
-}
-/*
-    char dataHora[64];
-    obtenirDataHora(dataHora, sizeof(dataHora));
-*/
 
 
 
@@ -20,7 +11,7 @@ void obtenirDataHora(char *buffer, int mida) {
 
 
 int main(){
-    //INICIALITZACI”
+    //INICIALITZACI√ì
     srand(time(NULL));
     const char *nomsDificultat[]=NOMS_DIFICULTAT;
     int victoriesJugador=0, victoriesMaquina=0;  //nombre de partides guanyades en general
@@ -50,10 +41,59 @@ int main(){
         netejarPantalla();
 
         if(opcio==1){
-            Jugar(&fitxerPartides, &guanyador, &dificultat, &numPartides,
-                      &victoriesJugador, &victoriesMaquina,
-                      &tempsJugador_millor, &tempsJugador_pitjor,
-                      &ratxaJugador, &ratxaMaximaJugador);
+            while(1){
+                netejarPantalla();
+                //Decidir qui comen√ßa la partida
+                char torn=decideixTornInicial(guanyador);
+        
+                //Partida
+                time_t inici=time(NULL);
+                guanyador=partida(torn,fitxerPartides,dificultat);
+                time_t fi=time(NULL);
+        
+                //Actualitzar MARCADOR
+                double durada=(double)(fi-inici);
+                numPartides++;
+        
+                if(guanyador==JUGADOR) {
+                    victoriesJugador++;
+                    ratxaJugador++;
+                    ratxaMaximaJugador = MAX(ratxaMaximaJugador, ratxaJugador);
+                    if(tempsJugador_millor<0||durada<tempsJugador_millor){ //el temps m√©s curt en guanyar el jugador
+                        tempsJugador_millor=durada;
+                        printf("Nou record del JUGADOR:%.0fs.\n",durada);
+                    }
+        
+                    if(/*tempsJugador_pitjor<0||*/durada>tempsJugador_pitjor){ //el temps m√©s llarg
+                        tempsJugador_pitjor=durada;
+                    }
+                }
+        
+                else if(guanyador==MAQUINA) {
+                        victoriesMaquina++;
+                        ratxaJugador=0;
+                }
+                //empats
+                else {ratxaJugador=0;}
+                
+                printf("\nDurada de la partida: %.0f segons\n", durada);
+        
+                // Mostrar marcador
+                printf("Dificultat MAQUINA Actual: %d (%s)\n\n", dificultat,nomsDificultat[dificultat]);
+                mostrarMarcador(stdout,numPartides,victoriesJugador,victoriesMaquina,tempsJugador_millor,tempsJugador_pitjor,ratxaJugador,ratxaMaximaJugador);
+        
+                if (fitxerPartides != NULL) {
+                    fprintf(fitxerPartides,"Dificultat MAQUINA Actual: %d (%s)\n\n", dificultat,nomsDificultat[dificultat]);
+                    printf("Partida guardada en Partides.txt\n");
+                    mostrarMarcador(fitxerPartides,numPartides, victoriesJugador, victoriesMaquina,tempsJugador_millor,tempsJugador_pitjor,ratxaJugador,ratxaMaximaJugador);
+        
+                }
+                // Preguntar si vol jugar una altra
+                if (!demanaSiNo("Vols jugar una altra partida?")) {break;}
+        
+        
+            }
+
             netejarPantalla();
 
         }
@@ -97,7 +137,7 @@ int main(){
 
 //Versio anterior
 int main2(){
-    //INICIALITZACI”
+    //INICIALITZACI√ì
     srand(time(NULL));
     const char *nomsDificultat[]=NOMS_DIFICULTAT;
     int victoriesJugador=0, victoriesMaquina=0;  //nombre de partides guanyades en general
@@ -125,7 +165,7 @@ int main2(){
         //Decidir la dificultat de la partida actual
         dificultat= demanaDificultat(dificultat);
 
-        //Decidir qui comenÁa la partida
+        //Decidir qui comen√ßa la partida
         char torn=decideixTornInicial(guanyador);
 
         //Partida
@@ -141,12 +181,12 @@ int main2(){
             victoriesJugador++;
             ratxaJugador++;
             ratxaMaximaJugador = MAX(ratxaMaximaJugador, ratxaJugador);
-            if(tempsJugador_millor<0||durada<tempsJugador_millor){ //el temps mÈs curt en guanyar el jugador
+            if(tempsJugador_millor<0||durada<tempsJugador_millor){ //el temps m√©s curt en guanyar el jugador
                 tempsJugador_millor=durada;
                 printf("Nou record del JUGADOR:%.0fs.\n",durada);
             }
 
-            if(/*tempsJugador_pitjor<0||*/durada>tempsJugador_pitjor){ //el temps mÈs llarg
+            if(/*tempsJugador_pitjor<0||*/durada>tempsJugador_pitjor){ //el temps m√©s llarg
                 tempsJugador_pitjor=durada;
             }
         }
