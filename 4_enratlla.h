@@ -33,6 +33,7 @@ void escriureTaulerFitxer(FILE *fitxer, char tauler[N][N]);
 int columnaValida(char tauler[N][N], int col);
 int dinsTauler(int fila, int col);
 int taulerPle(char tauler[N][N]);
+int taulerBuit(char tauler[N][N]);
 int tirada(char tauler[N][N],int col,char fitxa);
 
 /*REVISAR GUANYADOR, REVISANT TOT EL TAULER*/
@@ -58,7 +59,7 @@ int demanaNumero(int minim, int maxim);
 int demanaColumna(char tauler[N][N]);
 
 int demanaDificultat(int dificultatActual);
-int Menu(int dificultat,int guardar);
+int Menu(int dificultat,int guardar,int asistent);
 
 int configurarFitxer(FILE **fitxerPartides);
 
@@ -66,8 +67,9 @@ int configurarFitxer(FILE **fitxerPartides);
 void netejarPantalla();
 
 /*4 EN RATLLA*/
+void instruccions();
 char decideixTornInicial(char guanyadorAnterior);
-char partida(char torn,FILE *fitxer,int dificultat);
+char partida(char torn,FILE *fitxer,int dificultat,int asistent);
 void mostrarMarcador(FILE *sortida,int numPartides, int victoriesJugador, int victoriesMaquina,double recordJugador_MILLOR,double recordJugador_PITJOR,int ratxaJugador,int ratxaMaximaJugador);
 
 
