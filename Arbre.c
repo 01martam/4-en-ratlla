@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "funcioHeuristica.h"
 #include "Arbre.h"
 #include "4_enratlla.h"
 
@@ -410,9 +411,12 @@ double ferminimax(Node *p, int nivell, int *col) {
 int ferminimax_arbre(char tauler[N][N], int dificultat) {
     int col=-1;
     Node *arrel = malloc(sizeof(Node));
-    if(arrel==NULL) return col;
+    if(arrel==NULL) return col; // l'arrel es buida
     copiarTauler(arrel->tauler, tauler);
     arrel->n_fills = calcularNumeroDeFills(arrel->tauler);
+    if(arrel->n_fills==0) {//En cas que l'arrel no te fills
+        free(arrel);
+        return col;}
     arrel->fills = malloc(arrel->n_fills * sizeof(Node *));
     arrel->valor = 0;
 
@@ -424,380 +428,6 @@ int ferminimax_arbre(char tauler[N][N], int dificultat) {
 
     return col;
 }
-
-
-/**FUNCIÓ HEURISTICA**///potser posarlo en un altre.c?
-
-double funcioHeuristica(char tauler[N][N],int dificultat, Posicio Casella){
-    if(dificultat<=0){//totalment aleaotori
-        return ((double)rand() / RAND_MAX) * 2.0 * 1000 - 1000; //valors entre -1000 i 1000
-    }
-
-    //Ara primer mirem si hi ha jugades guanyadores o el tauler esta ple sense guanya
-
-    if(Casella.fila>=0){
-        if (ComprovaGuanyadorDesDe(tauler,MAQUINA,Casella,NULL)) return INFINIT;
-        if (ComprovaGuanyadorDesDe(tauler,JUGADOR,Casella,NULL)) return -INFINIT;
-    }
-    else{//Per si no tenim una ultima casella on tirem
-        if (ComprovarGuanyador(tauler, MAQUINA)) return INFINIT;
-        if (ComprovarGuanyador(tauler, JUGADOR)) return -INFINIT;
-    }
-    if(taulerPle(tauler)) return 0; //empat
-
-    //Aleaotiri però evitant victories
-    if(dificultat==1) return ((double)rand() / RAND_MAX) * 2.0 * 1000 - 1000; //valors entre -1000 i 1000
-    // contem quantes fitxes hi ha de cada tipus
-    if(dificultat==2)return contarCadaTipus(tauler);
-
-    if(dificultat==3) return contarCadaTipusCentre(tauler);
-    //Contem fitxes pero mirant de 4 en 4
-    if(dificultat==4)return sumaDelPesos(tauler,0);
-    //Contem fitxes pero mirant de 4 en 4, i a més mirem 2 fitxes més
-    if(dificultat>=5)return sumaDelPesos(tauler,1);
-//    if(dificultat >=6) return SumaJugadesGuanyadores(tauler);
-   return 0;
-}
-
-//conta el numero de fitxes de cada tipus i calcula la resta
-double contarCadaTipus(char tauler[N][N]){
-    int contM = 0, contJ = 0;
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            if (tauler[i][j] == MAQUINA) contM++;
-            else if (tauler[i][j] == JUGADOR) contJ++;
-        }
-    }
-    return (double)(contM - contJ);
-}
-
-//conta el numero de fitxes de cada tipus i calcula la resta
-// donan més pes a les fitxes més properes al centre
-double contarCadaTipusCentre(char tauler[N][N]){
-    int countM = 0, countJ = 0;
-    double extraM=0,extraJ=0;
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            double aux=abs(i - N/2) + abs(j - N/2);//distancia de (i,j) a (N/2,N/2) ->Norma 1 de la diferencia
-            aux=aux/(double)N;//normalitzar
-            aux=1.0-aux;
-            // la fitxa al centre del tauler és la posició(N/2,N/2)
-            // la norma 1 de (i,j)-(N/2,N/2) és  abs(i - N/2) + abs(j - N/2), pot pendre valors de 0 a N
-            //normalitza la distancia es dividir això pel valor maxim que pot adquirir, N
-            //pero volem que el centre tingui més pes llavors restem aixo a 1
-            if (tauler[i][j] == MAQUINA) {
-                    countM++;
-                    extraM+=aux;
-            }
-            else if (tauler[i][j] == JUGADOR) {
-                    countJ++;
-                    extraJ+=aux;
-            }
-        }
-    }
-    return (double)(countM - countJ)+(extraM-extraJ);
-}
-
-
-//Agafem les fitxes en posició  (fila, col), (fila+df, col+dc), (fila+2df, col+2dc), (fila+3df, col+3dc).
-//Avalua una finestre de 4 caselles en una direcció i li assigna un pes segons la quantitat de fitxes de cada tipus.
-//si el mode es diferent de 0, a més mirem els extrems (fila-df, col-df) i (fila+4df, col+4dc)
-double avalua(char tauler[N][N], int fila, int col, int df, int dc, int modo) {
-    int countM = 0, countJ = 0;
-
-    // Comptar fitxes
-    for (int k = 0; k < 4; k++) {
-        int f = fila + k * df;
-        int c = col + k * dc;
-        if (!dinsTauler(f, c)) return 0;
-        if (tauler[f][c] == MAQUINA) countM++;
-        else if (tauler[f][c] == JUGADOR) countJ++;
-    }
-
-    // Si hi ha fitxes dels dos, no és útil
-    if (countM > 0 && countJ > 0) return 0;
-
-    // Mode simple (avalua1)
-    if (modo == 0) {
-        if (countM == 4) return 1000000;
-        if (countM == 3) return 100;
-        if (countM == 2) return 10;
-        if (countM == 1) return 1;
-
-        if (countJ == 4) return -1000000;
-        if (countJ == 3) return -100;
-        if (countJ == 2) return -10;
-        if (countJ == 1) return -1;
-
-        return 0;
-    }
-    else{
-        // Mode avançat (avalua2)
-        // Comprovar extrems
-        int extrems = 0;
-        int f_inici = fila - df, c_inici = col - dc;
-        int f_fi = fila + 4 * df, c_fi = col + 4 * dc;
-
-        if (dinsTauler(f_inici, c_inici) && tauler[f_inici][c_inici] == BUIT) extrems++;
-        if (dinsTauler(f_fi, c_fi) && tauler[f_fi][c_fi] == BUIT) extrems++;
-
-        if (countM == 4) return 1000000;
-        if (countM == 3) {
-            if (extrems >= 2) return 10000;
-            if (extrems == 1) return 1000;
-            return 10;
-        }
-        if (countM == 2) {
-            if (extrems >= 2) return 100;
-            if (extrems == 1) return 10;
-            return 1;
-        }
-        if (countM == 1) return 1;
-
-        if (countJ == 4) return -1000000;
-        if (countJ == 3) {
-            if (extrems >= 2) return -10000;
-            if (extrems == 1) return -1000;
-            return -10;
-        }
-        if (countJ == 2) {
-            if (extrems >= 2) return -100;
-            if (extrems == 1) return -10;
-            return -1;
-        }
-        if (countJ == 1) return -1;
-
-        return 0;
-    }
-}
-
-//La suma dels pesos de avalua
-double sumaDelPesos(char tauler[N][N],int modo) {
-    double valor = 0;
-
-    // ─── Horitzontals ───
-    for (int i = 0; i < N; i++){
-        for (int j = 0; j <= N - 4; j++){
-            valor += avalua(tauler, i, j, 0, 1,modo);
-        }
-    }
-
-    // ─── Verticals ───
-    for (int i = 0; i <= N - 4; i++){
-        for (int j = 0; j < N; j++){
-            valor += avalua(tauler, i, j, 1, 0,modo);
-        }
-    }
-
-    // ─── Diagonal / ───
-    for (int i = 3; i < N; i++){
-        for (int j = 0; j <= N - 4; j++){
-            valor += avalua(tauler, i, j, -1, 1,modo);
-        }
-    }
-
-    // ─── Diagonal \ ───
-    for (int i = 0; i <= N - 4; i++){
-        for (int j = 0; j <= N - 4; j++){
-            valor += avalua(tauler, i, j, 1, 1,modo);
-        }
-    }
-
-    return valor;
-}
-
-
-/*Funcions a mirar per si utilitzo o no*/
-//Funcio que compta les jugades guanyadores
-int comptaJugadesGuanyadores(char tauler[N][N], char fitxa){
-    int total = 0;
-
-    for (int col = 0; col < N; col++) {
-        if (!columnaValida(tauler, col)) continue;
-
-        char copia[N][N];
-        copiarTauler(copia, tauler);
-        int fila=tirada(copia, col, fitxa);
-
-        if (ComprovarGuanyador(copia, fitxa)) {
-            total++;
-        }
-    }
-
-    return total;
-}
-
-//Funcio que suma totes les jugades guanyadores de cadascu
-double SumaJugadesGuanyadores(char tauler[N][N]){
-
-    int guanyadorsM=comptaJugadesGuanyadores(tauler,MAQUINA);
-    int guanyadorsJ=comptaJugadesGuanyadores(tauler,JUGADOR);
-    double v=0;
-
-    //Amenaces immediates
-    v+=guanyadorsM* 100000;
-    v-=guanyadorsJ* 120000;
-   // Dues jugades guanyadores simultanies solen ser decisives
-    if (guanyadorsM >= 2) v += 300000;
-    if (guanyadorsJ >= 2) v -= 350000;
-
-    // Patrons generals
-    v += sumaDelPesos(tauler, 1);
-
-    // Control del centre
-    v+= 5.0 * contarCadaTipusCentre(tauler);
-
-    return v;
-}
-
-
-
-
-/*retorna el nombre de linies de 2 que hi ha del caracter c en el  tauler que es podrien completar
-notem que tornem a estar contant les de de tres, però com que aquestes tenen 100 cops més punts,
-no val la pena evitar-ho*/
-int filesDe2(char tauler[N][N], char c) {
-    int i, j, files = 0;
-
-    //contem les horitzontals
-    for(i = 0; i < N; i++)
-        for(j = 0; j < N - 1; j++)
-            if( tauler[i][j] == c &&  tauler[i][j + 1] == c)
-                if ((j > 1 &&  tauler[i][j - 1] == BUIT &&  tauler[i][j - 2] == BUIT) ||
-                    (j + 3 < N &&  tauler[i][j + 2] == BUIT &&  tauler[i][j + 2] == BUIT) ||
-                    (j > 0 &&  tauler[i][j - 1] == BUIT && j + 2 < N &&  tauler[i][j + 2] == BUIT))
-                    files++;
-    //contem les veritcals
-    for(j = 0; j < N; j++)
-        for(i = 0; i < N - 1; i++)
-            if ( tauler[i][j] == c &&  tauler[i + 1][j] == c)
-                if (i + 3 < N &&  tauler[i + 2][j] == BUIT &&  tauler[i + 3][j] == BUIT)
-                    files++;
-    //contem les diagonals de dalt a l'esquerra a baix a la dreta (negatives)
-    for (i = 0; i < N - 1; i++)
-        for (j = 0; j < N - 1; j++)
-            if ( tauler[i][j] == c &&  tauler[i + 1][j + 1] == c)
-                if ((i > 0 && j > 0 &&  tauler[i - 1][j - 1] == BUIT) ||
-                    (i + 2 < N && j + 2 < N &&  tauler[i + 2][j + 2] == BUIT))
-                    files++;
-    //contem les diagonals de dalt a la dreta a baix a l'esquerra (positives)
-    for (i = 0; i < N - 1; i++)
-        for (j = 1; j < N; j++)
-            if ( tauler[i][j] == c &&  tauler[i + 1][j - 1] == c)
-                if ((i > 0 && j + 1 < N &&  tauler[i - 1][j + 1] == BUIT) ||
-                    (i + 2 < N && j - 1 > 0 &&  tauler[i + 2][j - 2] == BUIT))
-                    files++;
-    return files;
-}
-
-/*retorna el nombre de linies de 3 que hi ha del caracter c en el  tauler que es podrien completar*/
-int filesDe3(char  tauler[N][N], char c) {
-    int i, j, files = 0;
-
-    //contem les horitzontals
-    for(i = 0; i < N; i++)
-        for(j = 0; j < N - 2; j++)
-            if( tauler[i][j] == c &&  tauler[i][j + 1] == c &&  tauler[i][j + 2] == c) {
-                if ((j > 0 &&  tauler[i][j - 1] == BUIT) || (j + 3 < N &&  tauler[i][j + 3] == BUIT))
-                    files++;
-            }
-            else if (j + 3 < N &&  tauler[i][j] == c &&  tauler[i][j + 1] == c &&  tauler[i][j + 2] == BUIT &&  tauler[i][j + 3] == c)
-                files++;
-            else if (j + 3 < N &&  tauler[i][j] == c &&  tauler[i][j + 1] == BUIT &&  tauler[i][j + 2] == c &&  tauler[i][j + 3] == c)
-                files++;
-    //contem les veritcals
-    for(j = 0; j < N; j++)
-        for(i = 0; i < N - 2; i++)
-            if ( tauler[i][j] == c &&  tauler[i + 1][j] == c &&  tauler[i + 2][j] == c) {
-                if (i + 3 < N &&  tauler[i + 3][j] == BUIT)
-                    files++;
-            }
-    //contem les diagonals de dalt a l'esquerra a baix a la dreta (negatives)
-    for (i = 0; i < N - 2; i++)
-        for (j = 0; j < N - 2; j++)
-            if ( tauler[i][j] == c &&  tauler[i + 1][j + 1] == c &&  tauler[i + 2][j + 2] == c) {
-                if ((i > 0 && j > 0 &&  tauler[i - 1][j - 1] == BUIT) ||
-                    (i + 3 < N && j + 3 < N &&  tauler[i + 3][j + 3] == BUIT))
-                    files++;
-            }
-            else if (i + 3 < N && j + 3 < N &&  tauler[i][j] == c &&  tauler[i + 1][j + 1] == c &&  tauler[i + 2][j + 2] == BUIT &&  tauler[i + 3][j + 3] == c)
-                files++;
-            else if (i + 3 < N && j + 3 < N &&  tauler[i][j] == c &&  tauler[i + 1][j + 1] == BUIT &&  tauler[i + 2][j + 2] == c &&  tauler[i + 3][j + 3] == c)
-                files++;
-    //contem les diagonals de dalt a la dreta a baix a l'esquerra (positives)
-    for (i = 0; i < N - 2; i++)
-        for (j = 2; j < N; j++)
-            if ( tauler[i][j] == c &&  tauler[i + 1][j - 1] == c &&  tauler[i + 2][j - 2] == c) {
-                if ((i > 0 && j + 1 < N &&  tauler[i - 1][j + 1] == BUIT) ||
-                    (i + 3 < N && j - 2 > 0 &&  tauler[i + 3][j - 3] == BUIT))
-                    files++;
-            }
-            else if (i + 3 < N && j - 2 > 0 &&  tauler[i][j] == c &&  tauler[i + 1][j - 1] == c &&  tauler[i + 2][j - 2] == BUIT &&  tauler[i + 3][j - 3] == c)
-                files++;
-            else if (i + 3 < N && j - 2 > 0 &&  tauler[i][j] == c &&  tauler[i + 1][j - 1] == BUIT &&  tauler[i + 2][j - 2] == c &&  tauler[i + 3][j - 3] == c)
-                files++;
-    return files;
-}
-
-/*mira si hi ha linea horitzontal o veritcal o una diagonal inclinada positiva o
-negativa dels caracters en tot el  tauler i de llargada 4, retorna el char que té
-4 en ratlla o, en el seu defecte, un espai.
-diferència amb victoria: comprova totes les peces del tauler*/
-char victoria_tsencer(char  tauler[N][N]) {
-    int i, j;
-
-    //comprovem les horitzontals
-    for(i = 0; i < N; i++)
-        for(j = 0; j < N - 3; j++)
-            if ( tauler[i][j] != BUIT &&  tauler[i][j + 1] ==  tauler[i][j] &&
-                 tauler[i][j + 2] ==  tauler[i][j] &&  tauler[i][j + 3] ==  tauler[i][j])
-                return  tauler[i][j];
-    //comprovem les verticals
-    for(j = 0; j < N; j++)
-        for(i = 0; i < N - 3; i++)
-            if ( tauler[i][j] != BUIT &&  tauler[i + 1][j] ==  tauler[i][j] &&
-                 tauler[i + 2][j] ==  tauler[i][j] &&  tauler[i + 3][j] ==  tauler[i][j])
-                return  tauler[i][j];
-    //comprovem les diagonals de dalt a l'esquerra a baix a la dreta (negatives)
-    for (i = 0; i < N - 3; i++)
-        for (j = 0; j < N - 3; j++)
-            if ( tauler[i][j] != BUIT &&  tauler[i + 1][j + 1] ==  tauler[i][j] &&
-                 tauler[i + 2][j + 2] ==  tauler[i][j] &&  tauler[i + 3][j + 3] ==  tauler[i][j])
-                return  tauler[i][j];
-    //comprovem les diagonals de dalt a la dreta a baix a l'esquerra (positives)
-    for (i = 0; i < N - 3; i++)
-        for (j = 3; j < N; j++)
-            if ( tauler[i][j] != BUIT &&  tauler[i + 1][j - 1] ==  tauler[i][j] &&
-                 tauler[i + 2][j - 2] ==  tauler[i][j] &&  tauler[i + 3][j - 3] ==  tauler[i][j])
-                return  tauler[i][j];
-    return BUIT;
-}
-
-/*si hi ha victoria del programa retorna 100.000, si hi ha victoria de la persona retorna -100.000
-altrament, conta quantes files té cada jugador de dos i de 3 que es puguin completar i retorna la
-diferència entre les de 3 del programa i la persona multiplicades per 100 més la resta entre les de
-dos del programa i de la persona*/
-int f_heuristica(char  tauler[N][N]) {
-    char    vict;
-    int     max3, min3, max2, min2;
-
-    vict = victoria_tsencer( tauler);
-    if(vict == JUGADOR)
-        return -100000;
-    if(vict == MAQUINA)
-        return 100000;
-    min3 = filesDe3( tauler, JUGADOR);
-    max3 = filesDe3( tauler, MAQUINA);
-    min2 = filesDe2( tauler,JUGADOR);
-    max2 = filesDe2( tauler, MAQUINA);
-    return 100*(max3 - min3) + max2 - min2;
-}
-
-
-
-
-
-
 
 
 
@@ -823,20 +453,19 @@ void recorreTaulersRecursiu(Node *p,int Nivell) {
 
 int main1() {
     srand(123);
-    int dificultat =0;
-
-    char tauler[N][N] = {
+    int dificultat =1;
+    char tauler1[N][N] = {
     {'X', 'X', 'X', ' ', ' ', ' ', 'X', 'X'},   // fila 0
     {'X', 'O', 'X', ' ', ' ', ' ', 'O', 'O'},   // fila 1
     {'O', 'O', 'O', ' ', ' ', ' ', 'X', 'X'},   // fila 2
-    {'X', 'O', 'O', 'O', ' ', ' ', 'O', 'O'},   // fila 3
-    {'O', 'X', 'X', 'O', ' ', ' ', 'X', 'X'},   // fila 4
-    {'X', 'X', 'O', 'X', 'X', 'O', 'X', 'X'},   // fila 5
+    {'X', 'O', 'O', ' ', ' ', 'O', 'O', 'O'},   // fila 3
+    {'O', 'X', 'X', 'O', 'O', 'O', 'X', 'X'},   // fila 4
+    {'X', 'X', 'O', 'O', 'X', 'O', 'X', 'X'},   // fila 5
     {'O', 'X', 'X', 'O', 'O', 'X', 'O', 'O'},   // fila 6
     {'X', 'O', 'O', 'X', 'O', 'O', 'X', 'X'}    // fila 7
     };
 
-    char tauler2[8][8] = {
+    char tauler[8][8] = {
     {' ', ' ', 'X', 'X', ' ', ' ', 'O', 'O'},
     {' ', ' ', 'X', 'O', ' ', ' ', 'O', 'X'},
     {' ', ' ', 'O', 'O', ' ', ' ', 'X', 'X'},
@@ -844,7 +473,7 @@ int main1() {
     {' ', ' ', 'O', 'X', ' ', ' ', 'X', 'O'},
     {' ', ' ', 'X', 'X', ' ', ' ', 'O', 'X'},
     {' ', ' ', 'O', 'O', ' ', ' ', 'X', 'O'},
-    {' ', ' ', 'X', 'O', ' ', ' ', 'O', 'X'}
+    {'X', 'X', 'X', 'O', 'O', 'X', 'O', 'X'}
     };
 
     char tauler3[8][8] = {
@@ -869,27 +498,6 @@ int main1() {
     {'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X'}
     };
 
-    char tauler5[8][8] = {
-    {' ', 'X', 'O', ' ', 'X', 'O', ' ', 'X'},
-    {'O', 'X', ' ', 'O', 'X', ' ', 'O', 'X'},
-    {'X', ' ', 'O', 'X', ' ', 'O', 'X', ' '},
-    {' ', 'O', 'X', ' ', 'O', 'X', ' ', 'O'},
-    {'O', 'X', ' ', 'O', 'X', ' ', 'O', 'X'},
-    {'X', ' ', 'O', 'X', ' ', 'O', 'X', ' '},
-    {' ', 'O', 'X', ' ', 'O', 'X', ' ', 'O'},
-    {'O', 'X', ' ', 'O', 'X', ' ', 'O', 'X'}
-    };
-
-    char tauler6[8][8] = {
-    {'O', 'O', 'O', 'O', ' ', ' ', ' ', ' '},
-    {'X', 'X', 'X', ' ', ' ', ' ', ' ', ' '},
-    {'O', 'O', ' ', ' ', ' ', ' ', ' ', ' '},
-    {'X', 'X', 'X', 'X', ' ', ' ', ' ', ' '},
-    {'O', 'O', 'O', ' ', ' ', ' ', ' ', ' '},
-    {'X', 'X', ' ', ' ', ' ', ' ', ' ', ' '},
-    {'O', 'O', 'O', 'O', 'O', ' ', ' ', ' '},
-    {'X', 'X', 'X', ' ', ' ', ' ', ' ', ' '}
-    };
 
 
 

@@ -3,6 +3,7 @@
 #include <time.h>
 #include "4_enratlla.h"
 #include "Arbre.h"
+#include "funcioHeuristica.h"
 
 
 int main(){
@@ -98,7 +99,7 @@ int main(){
             mostrarMarcador(stdout, numPartides, victoriesJugador,
                             victoriesMaquina, tempsJugador_millor, tempsJugador_pitjor,
                             ratxaJugador, ratxaMaximaJugador);
-             printf(" Dificultat MAQUINA Actual: %d (%s)\n", dificultat,nomsDificultat[dificultat]);
+            printf(" Dificultat MAQUINA Actual: %d (%s)\n", dificultat,nomsDificultat[dificultat]);
             printf("\n Prem ENTER\n");
             getchar();
             netejarPantalla();
@@ -118,7 +119,7 @@ int main(){
             guardar=configurarFitxer(&fitxerPartides);
             netejarPantalla();
         }
-        else if(opcio==6){//editar més en partida()
+        else if(opcio==6){
             asistent=demanaSiNo("Vols pistes per escollir la columna a tirar?");
             netejarPantalla();
         }

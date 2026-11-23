@@ -13,12 +13,6 @@
 #define FONS_GROC "\033[43m"
 #define NEGRETA   "\033[1m"
 
-#define NOMS_DIFICULTAT {"Aleatoria", \
-                         "Aleatoria + victories", \
-                         "Comptar fitxes", \
-                         "Comptar fitxes resp Centre", \
-                         "4 simples", \
-                         "4 simples +2"}
 
 /*ESTRUCTURA*/
 typedef struct posicio {
@@ -72,11 +66,4 @@ char decideixTornInicial(char guanyadorAnterior);
 char partida(char torn,FILE *fitxer,int dificultat,int asistent);
 void mostrarMarcador(FILE *sortida,int numPartides, int victoriesJugador, int victoriesMaquina,double recordJugador_MILLOR,double recordJugador_PITJOR,int ratxaJugador,int ratxaMaximaJugador);
 
-
-
-
-
-
-
-
-#endif // 1_VS_1_H_INCLUDED
+#endif
