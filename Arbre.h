@@ -31,6 +31,8 @@ void CopiarTaulerInvertit(char desti[N][N],char origen[N][N]);
 int calcularNumeroDeFills(char tauler[N][N]);
 int numFillAColumna(char tauler[N][N],int numfill);
 
+void inicialitzaTaulerRandom(char tauler[N][N]);
+
 /*ARBRE DE 2 NIVELLS*/
 Node *creaNode2(Node *pare, int numFill, int nivell, int dificultat);
 void creaFills2(Node *pare, int nivell, int dificultat);
@@ -44,6 +46,8 @@ void creaArbreRec(Node *node, int nivell, int dificultat);
 /*RECORRE L'ARBRE*/
 void recorreArbre(Node *arrel);//Nomes serveix per nivell 2
 void recorreArbreRecursiu(Node *p,int Nivell);
+
+void recorreTaulersRecursiu(Node *p,int Nivell);
 
 /*BORRA ARBRE*/ //PER EDITAR
 void esborraNode(Node *p);
@@ -59,6 +63,7 @@ int tiradaMaquina_arbre(char tauler[N][N],int dificultat);
 
 double ferminimax(Node *p, int nivell, int *col);
 int ferminimax_arbre(char tauler[N][N],int dificultat);
+
 
 
 //

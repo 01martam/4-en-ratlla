@@ -543,7 +543,7 @@ void instruccions(){
                 "Revisem el tauler per tal de veure si hi ha linia guanyadora i despres a mes de revisar \n      4 fitxes com el '4simples' revisem 2 fitxes mes dels laterals.",
                 "Revisem el tauler per tal de veure si hi ha linia guanyadora i despres\n      Comptem quant tirs guanyadors que hi ha de cada tipus i li asignem un pes,i despres farem la seva suma."
     };
-    printf("\nExplicacio de com s'escull els valors de la funcio heuristica\n");
+    printf("\nExplicacio del les estrategies que segueix la màquina segons el nivell de dificultat.\n");
     for(int i =0;i<mida;i++) printf("  %i - %s:%s\n",i,nomsDificultat[i],Explicacio[i]);
     printf("\n Prem ENTER\n");
     getchar();
@@ -646,7 +646,7 @@ void mostrarMarcador(FILE *sortida,int numPartides, int victoriesJugador, int vi
     char* aux=(ratxaJugador==1)?"a":"es";
     char* aux2=(ratxaMaximaJugador==1)?"a":"es";
 
-    fprintf(sortida,"\n=========================RECORDS==========================\n");
+    fprintf(sortida,"\n======================== RECORDS =========================\n");
     fprintf(sortida," Partides jugades:     %d                \n", numPartides);
     fprintf(sortida," Victories JUGADOR:    %d                \n", victoriesJugador);
     fprintf(sortida," Victories MAQUINA:    %d                \n", victoriesMaquina);

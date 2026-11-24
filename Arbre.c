@@ -72,6 +72,22 @@ int numFillAColumna(char tauler[N][N],int numfill){
     return -1; // En cas d'error (no hauria d'arribar mai aquí si numFill és vàlid)
 }
 
+//Funció que crea de manera aleatoria un tauler del joc
+void inicialitzaTaulerRandom(char tauler[N][N]) {
+    inicialitzarTauler(tauler);//omplim tot buit
+
+    for (int j=0;j<N;j++) {
+        for (int i=N-1;i>=0;i--) {// de baix a adalt
+            double random = (double)rand()/RAND_MAX;
+            (tauler)[i][j]=BUIT;
+            if (random < 0.25) (tauler)[i][j]=JUGADOR; //jugador
+            else if (random <0.5) (tauler)[i][j]=MAQUINA; //màquina
+            else break;
+
+        }
+    }
+}
+
 
 /**Crear Arbre de nivell exactament 2**/
 //Crea un node fill a partir d’un pare
@@ -196,6 +212,19 @@ void recorreArbreRecursiu(Node *p,int Nivell){
         recorreArbreRecursiu(p->fills[i],Nivell+1);
     }
 }
+
+
+//Funció que imprimeix a un document el tauler que arriba a cada node de l'arbre (per veure que rep la funcio heuristica)
+void recorreTaulersRecursiu(Node *p,int Nivell) {
+    printf("\nNivell %i:%.0f",Nivell,p->valor);
+    escriureTaulerFitxer(stdout,p->tauler);
+    //dibuixarTauler(p->tauler, NULL);
+
+    for (int i = 0; i < p->n_fills; i++){
+        recorreTaulersRecursiu(p->fills[i],Nivell+1);
+    }
+}
+
 
 /**Esborra arbre**/
 // Esborra NOMÉS 1 node (sense els seus fills, que s'han d'haver esborrat abans)
@@ -435,38 +464,7 @@ int ferminimax_arbre(char tauler[N][N], int dificultat) {
 }
 
 
-
-
-
-/**Funció per veure que rep la funcio heuristica**/
-void recorreTaulersRecursiu(Node *p,int Nivell) {
-    printf("\nNivell %i:%.0f",Nivell,p->valor);
-    escriureTaulerFitxer(stdout,p->tauler);
-    //dibuixarTauler(p->tauler, NULL);
-
-    for (int i = 0; i < p->n_fills; i++){
-        recorreTaulersRecursiu(p->fills[i],Nivell+1);
-    }
-}
-
-void inicialitzaTaulerRandom(char tauler[N][N]) {
-    inicialitzarTauler(tauler);//omplim tot buit
-
-    for (int j=0;j<N;j++) {
-        for (int i=N-1;i>=0;i--) {// de baix a adalt
-            double random = (double)rand()/RAND_MAX;
-            (tauler)[i][j]=BUIT;
-            if (random < 0.25) (tauler)[i][j]=JUGADOR; //jugador
-            else if (random <0.5) (tauler)[i][j]=MAQUINA; //màquina
-            else break;
-
-        }
-    }
-}
-
-
 /*PROVES-----------------------------------------------------------*/
-
 
 int main1() {
     srand(time(NULL));

@@ -87,85 +87,147 @@ double comptarCadaTipusCentre(char tauler[N][N]){
 int liniesDe2(char tauler[N][N], char fitxa) {
     int i, j, linies = 0;
 
-    //contem les horitzontals
-    for(i = 0; i < N; i++)
-        for(j = 0; j < N - 1; j++)
-            if( tauler[i][j] == fitxa &&  tauler[i][j + 1] == fitxa)
-                if ((j > 1 &&  tauler[i][j - 1] == BUIT &&  tauler[i][j - 2] == BUIT) ||
-                    (j + 3 < N &&  tauler[i][j + 2] == BUIT &&  tauler[i][j + 3] == BUIT) ||
-                    (j > 0 &&  tauler[i][j - 1] == BUIT && j + 2 < N &&  tauler[i][j + 2] == BUIT))
+    //contem les horitzontals (de baix a dalt)
+    //_ _ X X
+    //X X _ _
+    //_ X X _
+    for(i = N - 1; i >= 0; i--){
+        for(j = 0; j < N - 1; j++){
+            if(tauler[i][j] == fitxa && tauler[i][j + 1] == fitxa){
+                if ((j > 1 && tauler[i][j - 1] == BUIT && tauler[i][j - 2] == BUIT) ||
+                    (j + 3 < N && tauler[i][j + 2] == BUIT && tauler[i][j + 3] == BUIT) ||
+                    (j > 0 && tauler[i][j - 1] == BUIT && j + 2 < N && tauler[i][j + 2] == BUIT))
                     {linies++;}
-    //contem les veritcals
-    for(j = 0; j < N; j++)
-        for(i = 0; i < N - 1; i++)
-            if ( tauler[i][j] == fitxa &&  tauler[i + 1][j] == fitxa)
-                if (i + 3 < N &&  tauler[i + 2][j] == BUIT &&  tauler[i + 3][j] == BUIT)
-                    linies++;
-    //contem les diagonals (\)
-    for (i = 0; i < N - 1; i++)
-        for (j = 0; j < N - 1; j++)
-            if ( tauler[i][j] == fitxa &&  tauler[i + 1][j + 1] == fitxa)
-                if ((i > 0 && j > 0 &&  tauler[i - 1][j - 1] == BUIT) ||
-                    (i + 2 < N && j + 2 < N &&  tauler[i + 2][j + 2] == BUIT))
-                    linies++;
-    //contem les diagonals (/)
-    for (i = 0; i < N - 1; i++)
-        for (j = 1; j < N; j++)
-            if ( tauler[i][j] == fitxa &&  tauler[i + 1][j - 1] == fitxa)
-                if ((i > 0 && j + 1 < N &&  tauler[i - 1][j + 1] == BUIT) ||
-                    (i + 2 < N && j > 1 &&  tauler[i + 2][j - 2] == BUIT))
-                    linies++;
+            }
+        }
+    }
+
+    //contem les verticals (de baix a dalt)
+    //-
+    //-
+    //X
+    //X
+    for(j = 0; j < N; j++){
+        for(i = N - 1; i > 0; i--){
+            if (tauler[i][j] == fitxa && tauler[i - 1][j] == fitxa){
+                if (i - 3 >= 0 && tauler[i - 2][j] == BUIT && tauler[i - 3][j] == BUIT)
+                    {linies++;}
+            }
+        }
+    }
+
+    //contem les diagonals (\) (de baix a dalt)
+    // X * * *    _ * * *    _ * * *
+    // * X * *    * _ * *    * X * *
+    // * * _ *    * * X *    * * X *
+    // * * * _    * * * X    * * * _
+    for (i = N - 1; i > 0; i--){
+        for (j = 1; j < N; j++){
+            if (tauler[i][j] == fitxa && tauler[i - 1][j - 1] == fitxa){
+                if ((i + 2 < N && j + 2 < N && tauler[i + 1][j + 1] == BUIT && tauler[i + 2][j + 2] == BUIT) ||
+                    (i - 3 >= 0 && j - 3 >= 0 && tauler[i - 2][j - 2] == BUIT && tauler[i - 3][j - 3] == BUIT) ||
+                    (i + 1 < N && j + 1 < N && tauler[i + 1][j + 1] == BUIT && i - 2 >= 0 && j - 2 >= 0 && tauler[i - 2][j - 2] == BUIT))
+                    {linies++;}
+            }
+        }
+    }
+
+    //contem les diagonals (/) (de baix a dalt)
+    // * * * X    * * * _    * * * _
+    // * * X *    * * _ *    * * X *
+    // * _ * *    * X * *    * X * *
+    // _ * * *    X * * *    _ * * *
+    for (i = N - 1; i > 0; i--){
+        for (j = 0; j < N - 1; j++){
+            if (tauler[i][j] == fitxa && tauler[i - 1][j + 1] == fitxa){
+                if ((i + 2 < N && j > 1 && tauler[i + 1][j - 1] == BUIT && tauler[i + 2][j - 2] == BUIT) ||
+                    (i - 3 >= 0 && j + 3 < N && tauler[i - 2][j + 2] == BUIT && tauler[i - 3][j + 3] == BUIT) ||
+                    (i + 1 < N && j > 0 && tauler[i + 1][j - 1] == BUIT && i - 2 >= 0 && j + 2 < N && tauler[i - 2][j + 2] == BUIT))
+                    {linies++;}
+            }
+        }
+    }
     return linies;
 }
+
 
 //Funcio que compta el nombre de linies de 3 un jugador (fitxa) en el  tauler que es podrien completar
-int liniesDe3(char  tauler[N][N], char fitxa) {
+int liniesDe3(char tauler[N][N], char fitxa) {
     int i, j, linies = 0;
 
-    //contem les horitzontals
-    for(i = 0; i < N; i++)
-        for(j = 0; j < N - 2; j++)
-            if( tauler[i][j] == fitxa &&  tauler[i][j + 1] == fitxa &&  tauler[i][j + 2] == fitxa) {
-                if ((j > 0 &&  tauler[i][j - 1] == BUIT) || (j + 3 < N &&  tauler[i][j + 3] == BUIT))
-                    linies++;
+    //contem les horitzontals (de baix a dalt)
+    //_ X X X
+    //X X X _
+    //X X _ X
+    //X _ X X
+    for(i = N - 1; i >= 0; i--){
+        for(j = 0; j < N - 2; j++){
+            if(tauler[i][j] == fitxa && tauler[i][j + 1] == fitxa && tauler[i][j + 2] == fitxa) {
+                if ((j > 0 && tauler[i][j - 1] == BUIT) || (j + 3 < N && tauler[i][j + 3] == BUIT))
+                    {linies++;}
             }
-            else if (j + 3 < N &&  tauler[i][j] == fitxa &&  tauler[i][j + 1] == fitxa &&  tauler[i][j + 2] == BUIT &&  tauler[i][j + 3] == fitxa)
-                linies++;
-            else if (j + 3 < N &&  tauler[i][j] == fitxa &&  tauler[i][j + 1] == BUIT &&  tauler[i][j + 2] == fitxa &&  tauler[i][j + 3] == fitxa)
-                linies++;
-    //contem les veritcals
-    for(j = 0; j < N; j++)
-        for(i = 0; i < N - 2; i++)
-            if ( tauler[i][j] == fitxa &&  tauler[i + 1][j] == fitxa &&  tauler[i + 2][j] == fitxa) {
-                if (i + 3 < N &&  tauler[i + 3][j] == BUIT)
-                    linies++;
+            else if (j + 3 < N && tauler[i][j] == fitxa && tauler[i][j + 1] == fitxa && tauler[i][j + 2] == BUIT && tauler[i][j + 3] == fitxa)
+                {linies++;}
+            else if (j + 3 < N && tauler[i][j] == fitxa && tauler[i][j + 1] == BUIT && tauler[i][j + 2] == fitxa && tauler[i][j + 3] == fitxa)
+                {linies++;}
+        }
+    }
+
+    //contem les verticals (de baix cap a dalt)
+    //_
+    //X
+    //X
+    //X
+    for(j = 0; j < N; j++){
+        for(i = N - 1; i > 1; i--){
+            if (tauler[i][j] == fitxa && tauler[i - 1][j] == fitxa && tauler[i - 2][j] == fitxa){
+                if (i - 3 >= 0 && tauler[i - 3][j] == BUIT)
+                    {linies++;}
             }
-    //contem les diagonals de dalt a l'esquerra a baix a la dreta (negatives)
-    for (i = 0; i < N - 2; i++)
-        for (j = 0; j < N - 2; j++)
-            if ( tauler[i][j] == fitxa &&  tauler[i + 1][j + 1] == fitxa &&  tauler[i + 2][j + 2] == fitxa) {
-                if ((i > 0 && j > 0 &&  tauler[i - 1][j - 1] == BUIT) ||
-                    (i + 3 < N && j + 3 < N &&  tauler[i + 3][j + 3] == BUIT))
-                    linies++;
+        }
+    }
+
+    //contem les diagonals (\) (de baix a dalt cap a l'esquerra)
+    //X * * *  _ * * *  X * * *  X * * *
+    //* X * *  * X * *  * _ * *  * X * *
+    //* * X *  * * X *  * * X *  * * _ *
+    //* * * _  * * * X  * * * X  * * * X
+    for (i = N - 1; i > 1; i--){
+        for (j = 2; j < N; j++){
+            if (tauler[i][j] == fitxa && tauler[i - 1][j - 1] == fitxa && tauler[i - 2][j - 2] == fitxa) {
+                if ((i + 1 < N && j + 1 < N && tauler[i + 1][j + 1] == BUIT) ||
+                    (i - 3 >= 0 && j - 3 >= 0 && tauler[i - 3][j - 3] == BUIT))
+                    {linies++;}
             }
-            else if (i + 3 < N && j + 3 < N &&  tauler[i][j] == fitxa &&  tauler[i + 1][j + 1] == fitxa &&  tauler[i + 2][j + 2] == BUIT &&  tauler[i + 3][j + 3] == fitxa)
-                linies++;
-            else if (i + 3 < N && j + 3 < N &&  tauler[i][j] == fitxa &&  tauler[i + 1][j + 1] == BUIT &&  tauler[i + 2][j + 2] == fitxa &&  tauler[i + 3][j + 3] == fitxa)
-                linies++;
-    //contem les diagonals de dalt a la dreta a baix a l'esquerra (positives)
-    for (i = 0; i < N - 2; i++)
-        for (j = 2; j < N; j++)
-            if ( tauler[i][j] == fitxa &&  tauler[i + 1][j - 1] == fitxa &&  tauler[i + 2][j - 2] == fitxa) {
-                if ((i > 0 && j + 1 < N &&  tauler[i - 1][j + 1] == BUIT) ||
-                    (i + 3 < N && j - 2 > 0 &&  tauler[i + 3][j - 3] == BUIT))
-                    linies++;
+            else if (i - 3 >= 0 && j - 3 >= 0 && tauler[i][j] == fitxa && tauler[i - 1][j - 1] == fitxa && tauler[i - 2][j - 2] == BUIT && tauler[i - 3][j - 3] == fitxa)
+                {linies++;}
+            else if (i - 3 >= 0 && j - 3 >= 0 && tauler[i][j] == fitxa && tauler[i - 1][j - 1] == BUIT && tauler[i - 2][j - 2] == fitxa && tauler[i - 3][j - 3] == fitxa)
+                {linies++;}
+        }
+    }
+
+    //contem les diagonals (/) (de baix a dalt cap a la dreta)
+    //* * * X  * * * _  * * * X  * * * X
+    //* * X *  * * X *  * * _ *  * * X *
+    //* X * *  * X * *  * X * *  * _ * *
+    //_ * * *  X * * *  X * * *  X * * *
+    for (i = N - 1; i > 1; i--){
+        for (j = 0; j < N - 2; j++){
+            if (tauler[i][j] == fitxa && tauler[i - 1][j + 1] == fitxa && tauler[i - 2][j + 2] == fitxa) {
+                if ((i + 1 < N && j - 1 >= 0 && tauler[i + 1][j - 1] == BUIT) ||
+                    (i - 3 >= 0 && j + 3 < N && tauler[i - 3][j + 3] == BUIT))
+                    {linies++;}
             }
-            else if (i + 3 < N && j - 2 > 0 &&  tauler[i][j] == fitxa &&  tauler[i + 1][j - 1] == fitxa &&  tauler[i + 2][j - 2] == BUIT &&  tauler[i + 3][j - 3] == fitxa)
-                linies++;
-            else if (i + 3 < N && j - 2 > 0 &&  tauler[i][j] == fitxa &&  tauler[i + 1][j - 1] == BUIT &&  tauler[i + 2][j - 2] == fitxa &&  tauler[i + 3][j - 3] == fitxa)
-                linies++;
+            else if (i - 3 >= 0 && j + 3 < N && tauler[i][j] == fitxa && tauler[i - 1][j + 1] == fitxa && tauler[i - 2][j + 2] == BUIT && tauler[i - 3][j + 3] == fitxa)
+                {linies++;}
+            else if (i - 3 >= 0 && j + 3 < N && tauler[i][j] == fitxa && tauler[i - 1][j + 1] == BUIT && tauler[i - 2][j + 2] == fitxa && tauler[i - 3][j + 3] == fitxa)
+                {linies++;}
+        }
+    }
+
     return linies;
 }
+
 
 //funcio que conta quantes files té cada jugador de 2 i de 3 que es puguin completar i retorna ladiferència entre les de 3 de la maquina i el jugador  multiplicades per 100 més la resta entre les de 2 de la maquina i del jugador
 double comptarLinies(char  tauler[N][N]) {
@@ -328,3 +390,68 @@ double SumaJugadesGuanyadores(char tauler[N][N]){
     return v;
 }
 
+/*Proves---------*/
+
+int main(){
+    char t1[8][8] = {
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {'X', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {'X', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {'X', ' ', ' ', 'O', 'O', ' ', ' ', ' '}
+    };
+
+    char t2[8][8] = {
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {'O', 'O', 'X', ' ', ' ', ' ', ' ', ' '},
+    {'O', 'X', 'O', ' ', ' ', ' ', ' ', ' '},
+    {'X', 'O', 'X', ' ', ' ', ' ', ' ', ' '}
+    };
+
+    char t3[8][8] = {
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', 'X', 'O', 'O'},
+    {' ', ' ', ' ', ' ', ' ', 'O', 'X', 'O'},
+    {' ', ' ', ' ', ' ', ' ', 'X', 'O', 'X'}
+    };
+
+    char t[8][8] = {
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X'},
+    {' ', ' ', ' ', ' ', ' ', ' ', 'X', 'O'},
+    {' ', ' ', ' ', ' ', ' ', ' ', 'O', 'X'},
+    {'X', 'X', ' ', 'X', 'X', 'O', 'X', 'O'}
+    };
+    char t5[8][8] = {
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {'O', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {'X', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {'X', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {'X', 'O', ' ', ' ', ' ', 'O', 'X', 'X'}
+    };
+    dibuixarTauler(t,NULL);
+    printf("#Linia 2 Jugador= %i \n",liniesDe2(t,JUGADOR));
+    printf("#Linia 2 Maquina=%i\n",liniesDe2(t,MAQUINA));
+    printf("#Linia 3 Jugador= %i\n",liniesDe3(t,JUGADOR));
+    printf("#Linia 3 Maquina=%i\n",liniesDe3(t,MAQUINA));
+
+
+
+}

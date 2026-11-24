@@ -6,30 +6,24 @@
 #include "funcioHeuristica.h"
 
 
-int main(){
+int main0(){
     //INICIALITZACIÓ
     srand(time(NULL));
     const char *nomsDificultat[]=NOMS_DIFICULTAT;
-    int victoriesJugador=0, victoriesMaquina=0;  //nombre de partides guanyades en general
-    int numPartides=0;
+    int victoriesJugador=0, victoriesMaquina=0;  //nombre de partides guanyades
+    int numPartides=0;//nombre de partides
     //empats= numPartides-victoriesJugador-victoriesMaquina
     int ratxaJugador=0,ratxaMaximaJugador=0;// nombre de partides guanyades seguides
     double tempsJugador_millor=-1,tempsJugador_pitjor=-1;//sense record
 
     char guanyador=0;//primera partida o empat , els altres valors son MAQUINA o JUGADOR
-    int dificultat=5;// dificultat per defecte
+    int dificultat=7;// dificultat per defecte
     int asistent=0;// 1 TRUE 0 FALSE una maquina ens dona una pista d'on tirar
 
     //FITXER de partides
     FILE *fitxerPartides=NULL;
     int guardar=0;
 
-//    int guardar=demanaSiNo("Vols guardar un historial de les partides en un fitxer?");
-//    // Obrir el fitxer de partides (si hem dit si)
-//    if (guardar){
-//        fitxerPartides = fopen("Partides.txt", "a");
-//        if (fitxerPartides == NULL) fprintf(stderr, "Error: no s'ha pogut obrir _.txt\n");
-//    }
     printf(" ___  ___ _  _ _   _ ___ _  _  ___ _   _ _____ \n");
     printf("| _ )| __| \\| \\ \\ / /_ _| \\| |/ __| | | |_   _|\n");
     printf("| _ \\| _|| .` |\\ V / | || .` | (_ | |_| | | |  \n");
