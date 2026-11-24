@@ -30,6 +30,12 @@ int main(){
 //        fitxerPartides = fopen("Partides.txt", "a");
 //        if (fitxerPartides == NULL) fprintf(stderr, "Error: no s'ha pogut obrir _.txt\n");
 //    }
+    printf(" ___  ___ _  _ _   _ ___ _  _  ___ _   _ _____ \n");
+    printf("| _ )| __| \\| \\ \\ / /_ _| \\| |/ __| | | |_   _|\n");
+    printf("| _ \\| _|| .` |\\ V / | || .` | (_ | |_| | | |  \n");
+    printf("|___/|___|_|\\_| \\_/ |___|_|\\_|\\___|\\___/  |_|  \n");
+    printf("\n Prem ENTER\n");
+    getchar();
     instruccions();
     netejarPantalla();
     while(1){

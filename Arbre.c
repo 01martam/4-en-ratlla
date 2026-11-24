@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "funcioHeuristica.h"
 #include "Arbre.h"
@@ -277,26 +278,32 @@ double minimax(Node *p, int nivell) {
 //Funció que calcula la columna a traves de fer minimax
 int tiradaMaquina(Node *arrel) {
     double aux = -INFINIT;
-    int col = -1;
+    int millor = 0;
 
     for (int i = 0; i < arrel->n_fills; i++) {
         double v = minimax(arrel->fills[i], 1);   // ← crida minimax per cada fill
         if (v > aux) {
             aux = v;
-            col = numFillAColumna(arrel->tauler, i);
+            millor = i;
         }
     }
 
     arrel->valor = aux;
-    return col;
+    return numFillAColumna(arrel->tauler, millor);
 }
 
 //Funció que crea l'arbre i que calcula la columna a traves de fer minimax
 int tiradaMaquina_arbre(char tauler[N][N],int dificultat) {
     //crear l'arrel
     Node *arrel = malloc(sizeof(Node));
+    if (arrel==NULL) return -1;
     copiarTauler(arrel->tauler, tauler);
     arrel->n_fills = calcularNumeroDeFills(arrel->tauler);
+
+    if(arrel->n_fills==0){
+        free(arrel);
+        return -1;
+    }
     arrel->fills = malloc(arrel->n_fills * sizeof(Node *));
     arrel->valor = 0;
 
@@ -305,18 +312,18 @@ int tiradaMaquina_arbre(char tauler[N][N],int dificultat) {
 
     //Recorrem els fills per triar el millor
     double aux = -INFINIT;
-    int col = -1;
+    int millor=0;
 
     for (int i = 0; i < arrel->n_fills; i++) {
         double v = minimax(arrel->fills[i], 1);   // ← crida minimax per cada fill
         if (v > aux) {
             aux = v;
-            col = numFillAColumna(arrel->tauler, i);
+           millor=i;
         }
     }
 
     //arrel->valor = aux; no cal realment
-
+    int col = numFillAColumna(arrel->tauler, millor);
     //esborrem l'arbre
     esborraArbreRec(arrel);
     free(arrel);
@@ -329,7 +336,7 @@ int tiradaMaquina_arbre(char tauler[N][N],int dificultat) {
 //	//Pas 1: comprovar si estem a les fulles ( és a dir al nivell maxim de l'arbre)
 //    if (p->n_fills == 0) {return p->valor;}
 //    double aux;
-//    int millor=0;
+//    int millor=0;// inicialitzem amb la primera columna posible
 //	//Pas 2:Separar els casos en si estem fent maxim o minim
 //	//Cas maxim
 //    if (nivell % 2 == 0) {
@@ -367,14 +374,12 @@ int tiradaMaquina_arbre(char tauler[N][N],int dificultat) {
 //}
 
 
-
 //Funcio que far el minimax i alhora calcula la columna que necesita
 double ferminimax(Node *p, int nivell, int *col) {
     //Pas 1: comprovar si estem a les fulles ( és a dir al nivell maxim de l'arbre)
     if (p->n_fills == 0) {return p->valor;}
     //Pas 2:Separar els casos en si estem fent maxim o minim
-    int columna=-1;
-
+    int columna=numFillAColumna(p->tauler, 0);// inicialitzem amb la primera columna posible
     //Cas maxim
     if (nivell % 2 ==0) {
         double aux = -INFINIT;
@@ -444,16 +449,28 @@ void recorreTaulersRecursiu(Node *p,int Nivell) {
     }
 }
 
+void inicialitzaTaulerRandom(char tauler[N][N]) {
+    inicialitzarTauler(tauler);//omplim tot buit
+
+    for (int j=0;j<N;j++) {
+        for (int i=N-1;i>=0;i--) {// de baix a adalt
+            double random = (double)rand()/RAND_MAX;
+            (tauler)[i][j]=BUIT;
+            if (random < 0.25) (tauler)[i][j]=JUGADOR; //jugador
+            else if (random <0.5) (tauler)[i][j]=MAQUINA; //màquina
+            else break;
+
+        }
+    }
+}
 
 
-
-
-/*MAIN-----------------------------------------------------------*/
+/*PROVES-----------------------------------------------------------*/
 
 
 int main1() {
-    srand(123);
-    int dificultat =1;
+    srand(time(NULL));
+    int dificultat =7;
     char tauler1[N][N] = {
     {'X', 'X', 'X', ' ', ' ', ' ', 'X', 'X'},   // fila 0
     {'X', 'O', 'X', ' ', ' ', ' ', 'O', 'O'},   // fila 1
@@ -465,7 +482,7 @@ int main1() {
     {'X', 'O', 'O', 'X', 'O', 'O', 'X', 'X'}    // fila 7
     };
 
-    char tauler[8][8] = {
+    char tauler2[8][8] = {
     {' ', ' ', 'X', 'X', ' ', ' ', 'O', 'O'},
     {' ', ' ', 'X', 'O', ' ', ' ', 'O', 'X'},
     {' ', ' ', 'O', 'O', ' ', ' ', 'X', 'X'},
@@ -498,8 +515,8 @@ int main1() {
     {'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X'}
     };
 
-
-
+    char tauler[8][8];
+    inicialitzaTaulerRandom(tauler);
 
 	Node arrel;
     inicialitzarTauler(arrel.tauler);
@@ -546,4 +563,75 @@ int main1() {
 	//free(arrel) si arrel fos dinamic
 
 	return 0;
+}
+
+
+#define NUM_PROVES 5
+
+int main2() {
+    srand(time(NULL));
+    const char *nomsDificultat[] = NOMS_DIFICULTAT; // els noms de les dificultats
+    int numDificultats = sizeof(nomsDificultat) / sizeof(nomsDificultat[0]);// el nombre de dificultats
+
+    for (int prova = 1; prova <= NUM_PROVES; prova++) {
+        char taulerBase[N][N];
+
+        // Genera tauler
+        inicialitzaTaulerRandom(taulerBase);
+
+        printf("\n=================================================================\n");
+        printf("                    PROVA ALEATORIA #%d / %d\n", prova, NUM_PROVES);
+        printf("\n=================================================================\n");
+        dibuixarTauler(taulerBase, NULL);
+
+        // Probamos todas las dificultades sobre este mismo tablero aleatorio
+        for (int dificultat = 0; dificultat < numDificultats; dificultat++) {
+            printf("\n------------------------------------------------------\n");
+            printf("[Prova #%d] Dificultat %d: %s\n", prova, dificultat, nomsDificultat[dificultat]);
+            printf("------------------------------------------------------\n");
+
+            // Copia el tauler base per no modificarlo amb les diferents dificultats
+            char taulerProva[N][N];
+            copiarTauler(taulerProva, taulerBase);
+
+            // 2. Inici de l'arrel
+            Node arrel;
+            copiarTauler(arrel.tauler, taulerProva);
+            arrel.valor = 0;// per no tindre valors basura al crear l'arbre
+            arrel.n_fills = calcularNumeroDeFills(arrel.tauler);
+
+            if (arrel.n_fills == 0) {
+                printf("Tauler ple, passant a la seguent prova.\n");
+                break;
+            }
+
+            arrel.fills = malloc(arrel.n_fills * sizeof(Node *));
+            if (arrel.fills == NULL) {
+                fprintf(stderr, "Error reservant memoria a l'arrel\n");
+                return 1;
+            }
+
+            // 3. Creem l'arbre i i fem minimax
+            creaArbreRec(&arrel, 0, dificultat);
+
+            Posicio p;
+            p.col = -1;
+            double valor = ferminimax(&arrel, 0, &p.col);
+
+            //Mirem si dona error per que la columna no es valida
+            if (p.col < 0 || !columnaValida(taulerProva, p.col)) {
+                fprintf(stderr, "ALERTA: Columna invalida (%d)!\n", p.col);
+            } else {
+                p.fila = tirada(taulerProva, p.col, MAQUINA);
+                printf("Columna triada (1-8): %d | Fila: %d | Valor minimax: %.2f\n",
+                       p.col + 1, p.fila, valor);
+                dibuixarTauler(taulerProva, NULL);
+            }
+
+            // 4. Esborrem l'arbre
+            esborraArbreRec(&arrel);
+        }
+    }
+
+    return 0;
 }
