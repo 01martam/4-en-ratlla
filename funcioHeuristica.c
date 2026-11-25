@@ -392,7 +392,7 @@ double SumaJugadesGuanyadores(char tauler[N][N]){
 
 /*Proves---------*/
 
-int main(){
+int main3(){
     char t1[8][8] = {
     {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
     {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
@@ -453,5 +453,5 @@ int main(){
     printf("#Linia 3 Maquina=%i\n",liniesDe3(t,MAQUINA));
 
 
-
+    return 0;
 }

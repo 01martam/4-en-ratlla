@@ -6,7 +6,7 @@
 #include "funcioHeuristica.h"
 
 
-int main0(){
+int main(){
     //INICIALITZACIÓ
     srand(time(NULL));
     const char *nomsDificultat[]=NOMS_DIFICULTAT;
