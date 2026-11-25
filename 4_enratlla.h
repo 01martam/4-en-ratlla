@@ -13,6 +13,13 @@
 #define FONS_GROC "\033[43m"
 #define NEGRETA   "\033[1m"
 
+#define NOMS_DIFICULTAT {"Aleatoria", \
+                         "Aleatoria + victories", \
+                         "Comptar fitxes", \
+                         "Comptar fitxes resp Centre", \
+                         "4 simples", \
+                         "4 simples +2"}
+
 /*ESTRUCTURA*/
 typedef struct posicio {
     int fila;
@@ -24,8 +31,9 @@ void inicialitzarTauler(char tauler[N][N]);
 void dibuixarTauler(char tauler[N][N],Posicio linia[4]);
 void escriureTaulerFitxer(FILE *fitxer, char tauler[N][N]);
 int columnaValida(char tauler[N][N], int col);
-int taulerPle(char tauler[N][N]);
 int dinsTauler(int fila, int col);
+int taulerPle(char tauler[N][N]);
+int taulerBuit(char tauler[N][N]);
 int tirada(char tauler[N][N],int col,char fitxa);
 
 /*REVISAR GUANYADOR, REVISANT TOT EL TAULER*/
@@ -35,45 +43,34 @@ int Linia_Diagonal_dret(char tauler[N][N],char fitxa);
 int Linia_Diagonal_esq(char tauler[N][N],char fitxa);
 int ComprovarGuanyador(char tauler[N][N],char fitxa);
 
-/*REVISAR GUANYADOR DESDE LA POSICIÓ DE L'ÚLTIMA FITXA*/
+/*REVISAR GUANYADOR DESDE LA POSICIÃ“ DE L'ÃšLTIMA FITXA*/
 int Fitxa_Linia_Horitzontal(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]);
 int Fitxa_Linia_vertical(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]);
 int Fitxa_Linia_Diagonal_dret(char tauler[N][N], char fitxa,Posicio p, Posicio L[4]);
 int Fitxa_Linia_Diagonal_esq(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]);
+int Fitxa_Linia(char tauler[N][N], char fitxa, Posicio p, int df, int dc, Posicio linia[4]);
 int ComprovaGuanyadorDesDe(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]);
 
-int Fitxa_Linia(char tauler[N][N], char fitxa, Posicio p, int df, int dc, Posicio linia[4]);
 
 /*DEMANAR AL USUARI*/
-int demanaColumna(char tauler[N][N]);
-int demanaDificultat();
 int demanaSiNo(char *pregunta);
+int demanaNumero(int minim, int maxim);
+
+int demanaColumna(char tauler[N][N]);
+
+int demanaDificultat(int dificultatActual);
+int Menu(int dificultat,int guardar,int asistent);
+
+int configurarFitxer(FILE **fitxerPartides);
 
 /*NETEJAR LA PANTALLA*/
 void netejarPantalla();
 
-/*MARCADOR*/
-void mostrarMarcador(FILE *sortida,int dificultat,int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador_MILLOR,double recordJugador_PITJOR);
-
 /*4 EN RATLLA*/
+void instruccions();
 char decideixTornInicial(char guanyadorAnterior);
-char partida(char torn,FILE *fitxer,int dificultat);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+char partida(char torn,FILE *fitxer,int dificultat,int asistent);
+void mostrarMarcador(FILE *sortida,int numPartides, int victoriesJugador, int victoriesMaquina,double recordJugador_MILLOR,double recordJugador_PITJOR,int ratxaJugador,int ratxaMaximaJugador);
 
 
 

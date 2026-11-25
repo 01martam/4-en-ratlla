@@ -26,6 +26,7 @@ typedef struct node {
 
 /*SOBRE EL TAULER*/
 void copiarTauler(char desti[N][N],char origen[N][N]);
+void CopiarTaulerInvertit(char desti[N][N],char origen[N][N]);
 int calcularNumeroDeFills(char tauler[N][N]);
 int numFillAColumna(char tauler[N][N],int numfill);
 
@@ -51,7 +52,6 @@ void esborraArbreRec(Node *arrel);
 
 /*MINIMAX*/
 double minimax(Node *p, int nivell);
-int millorColumna(Node *arrel);
 
 int tiradaMaquina(Node *arrel);
 int tiradaMaquina_arbre(char tauler[N][N],int dificultat);
@@ -64,7 +64,6 @@ double contarCadaTipus(char tauler[N][N]);
 double contarCadaTipusCentre(char tauler[N][N]);
 double avalua(char tauler[N][N], int fila, int col, int df, int dc, int modo);
 double sumaDelPesos(char tauler[N][N],int modo);
-double funcioHeuristica(char tauler[N][N],int dificultat);
-
+double funcioHeuristica(char tauler[N][N],int dificultat, Posicio Casella);
 
 #endif // ARBRE_H_INCLUDED
