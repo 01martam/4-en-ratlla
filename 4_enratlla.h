@@ -14,16 +14,18 @@
 #define NEGRETA   "\033[1m"
 
 /*ESTRUCTURA*/
-typedef struct {
+typedef struct posicio {
     int fila;
     int col;
 } Posicio;
 
 /*SOBRE EL TAULER*/
 void inicialitzarTauler(char tauler[N][N]);
-void dibuixarTauler(char tauler[N][N],Posicio *linia);
+void dibuixarTauler(char tauler[N][N],Posicio linia[4]);
+void escriureTaulerFitxer(FILE *fitxer, char tauler[N][N]);
 int columnaValida(char tauler[N][N], int col);
 int taulerPle(char tauler[N][N]);
+int dinsTauler(int fila, int col);
 int tirada(char tauler[N][N],int col,char fitxa);
 
 /*REVISAR GUANYADOR, REVISANT TOT EL TAULER*/
@@ -40,19 +42,22 @@ int Fitxa_Linia_Diagonal_dret(char tauler[N][N], char fitxa,Posicio p, Posicio L
 int Fitxa_Linia_Diagonal_esq(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]);
 int ComprovaGuanyadorDesDe(char tauler[N][N], char fitxa,Posicio p,Posicio L[4]);
 
+int Fitxa_Linia(char tauler[N][N], char fitxa, Posicio p, int df, int dc, Posicio linia[4]);
+
 /*DEMANAR AL USUARI*/
 int demanaColumna(char tauler[N][N]);
-int demanaSiNo();
+int demanaDificultat();
+int demanaSiNo(char *pregunta);
 
 /*NETEJAR LA PANTALLA*/
 void netejarPantalla();
-void netejarPantalla2();
 
 /*MARCADOR*/
-void mostrarMarcador(int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador_MILLOR,double recordMaquina_MILLOR,double recordJugador_PITJOR,double recordMaquina_PITJOR);
+void mostrarMarcador(FILE *sortida,int dificultat,int numPartides, int victoriesJugador, int victoriesMaquina, int empats,double recordJugador_MILLOR,double recordJugador_PITJOR);
 
 /*4 EN RATLLA*/
-char partida(char torn);
+char decideixTornInicial(char guanyadorAnterior);
+char partida(char torn,FILE *fitxer,int dificultat);
 
 
 

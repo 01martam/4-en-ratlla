@@ -1,7 +1,7 @@
 #ifndef ARBRE_H
 #define ARBRE_H
 
-#include "4 enratlla.h"
+#include "4_enratlla.h"
 /*CONSTANTS propies del joc (dins de  "4 enratlla.h")*/
 //#define N 8
 //#define BUIT ' '
@@ -9,7 +9,7 @@
 //#define JUGADOR 'O'
 
 /*CONSTANTS*/
-#define PROFUNDITAT 2// nivells de l'arbre
+#define PROFUNDITAT 4// nivells de l'arbre
 #define INFINIT 1e9 // Variable de numero gran
 
 /*ESTRUCTURA*/
@@ -22,24 +22,22 @@ typedef struct node {
 /*MAXIM I MINIM*/
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
-
+#define ABS(a) ((a)>=0? (a):-(a))
 
 /*SOBRE EL TAULER*/
 void copiarTauler(char desti[N][N],char origen[N][N]);
 int calcularNumeroDeFills(char tauler[N][N]);
-
-/*ARBRE*/
 int numFillAColumna(char tauler[N][N],int numfill);
 
 /*ARBRE DE 2 NIVELLS*/
-Node *creaNode2(Node *pare, int numFill, int nivell);
-void creaFills2(Node *pare, int nivell);
-void creaArbre2(Node *arrel);
+Node *creaNode2(Node *pare, int numFill, int nivell, int dificultat);
+void creaFills2(Node *pare, int nivell, int dificultat);
+void creaArbre2(Node *arrel, int dificultat);
 
 /*ARBRE DE +2 NIVELL*/
-Node *creaNode(Node *pare, int numFill, int nivell);
-void creaFills(Node *pare, int nivell);
-void creaArbreRec(Node *node, int nivell);
+Node *creaNode(Node *pare, int numFill, int nivell, int dificultat);
+void creaFills(Node *pare, int nivell, int dificultat);
+void creaArbreRec(Node *node, int nivell, int dificultat);
 
 /*RECORRE L'ARBRE*/
 void recorreArbre(Node *arrel);//Nomes serveix per nivell 2
@@ -56,13 +54,17 @@ double minimax(Node *p, int nivell);
 int millorColumna(Node *arrel);
 
 int tiradaMaquina(Node *arrel);
-int tiradaMaquina_arbre(char tauler[N][N]);
+int tiradaMaquina_arbre(char tauler[N][N],int dificultat);
 
 double ferminimax(Node *p, int nivell, int *col);
-int ferminimax_arbre(char tauler[N][N]);
+int ferminimax_arbre(char tauler[N][N],int dificultat);
 
-/*PER EDITAR*/
-double funcioHeuristica();
+/*FUNCIÓ HEURISTICA*/
+double contarCadaTipus(char tauler[N][N]);
+double contarCadaTipusCentre(char tauler[N][N]);
+double avalua(char tauler[N][N], int fila, int col, int df, int dc, int modo);
+double sumaDelPesos(char tauler[N][N],int modo);
+double funcioHeuristica(char tauler[N][N],int dificultat);
 
 
 #endif // ARBRE_H_INCLUDED
