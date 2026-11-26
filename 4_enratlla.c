@@ -86,8 +86,12 @@ int columnaValida(char tauler[N][N], int col) {
 }
 
 // Comprova si una casella és dins del tauler
-int dinsTauler(int fila, int col) {
-    return fila >= 0 && fila < N && col >= 0 && col < N;
+//int dinsTauler(int fila, int col) {
+//    return fila >= 0 && fila < N && col >= 0 && col < N;
+//}
+
+int dinsTauler(Posicio p) {
+    return p.fila >= 0 && p.fila < N && p.col >= 0 && p.col < N;
 }
 
 // Comprova si el tauler està ple (1 = ple, 0 = encara hi ha lloc)
@@ -301,22 +305,23 @@ int Fitxa_Linia(char tauler[N][N], char fitxa, Posicio p, int df, int dc, Posici
     Posicio inici=p;
     // Cap endavant (df, dc)
     for (int k = 1; k < 4; k++) {
-        int f = p.fila + k * df;
-        int c = p.col + k * dc;
-        if (!dinsTauler(f,c)) break;
-        if (tauler[f][c] == fitxa) aux++;
+        Posicio casella={p.fila + k * df,p.col + k * dc};
+//        int f = p.fila + k * df;
+//        int c = p.col + k * dc;
+        if (!dinsTauler(casella)) break;
+        if (tauler[casella.fila][casella.col] == fitxa) aux++;
         else break;
     }
 
     // Cap enrere (-df, -dc)
     for (int k = 1; k < 4; k++) {
-        int f = p.fila - k * df;
-        int c = p.col - k * dc;
-        if (!dinsTauler(f,c)) break;
-        if (tauler[f][c] == fitxa) {
+        Posicio casella={p.fila - k * df,p.col - k * dc};
+//        int f = p.fila - k * df;
+//        int c = p.col - k * dc;
+        if (!dinsTauler(casella)) break;
+        if (tauler[casella.fila][casella.col] == fitxa) {
             aux++;
-            inici.fila = f;
-            inici.col = c;
+            inici= casella;
         } else {
             break;
         }

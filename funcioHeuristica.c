@@ -255,7 +255,7 @@ double avalua(char tauler[N][N], int fila, int col, int df, int dc, int modo) {
         Posicio c={fila + k * df,col + k * dc};
         //int f = fila + k * df;
         //int c = col + k * dc;
-        if (!dinsTauler(c.fila, c.col)) return 0;
+        if (!dinsTauler(c)) return 0;
         if (tauler[c.fila][c.col] == MAQUINA) countM++;
         else if (tauler[c.fila][c.col] == JUGADOR) countJ++;
     }
@@ -285,8 +285,8 @@ double avalua(char tauler[N][N], int fila, int col, int df, int dc, int modo) {
         //int f_inici = fila - df, c_inici = col - dc;
         //int f_fi = fila + 4 * df, c_fi = col + 4 * dc;
 
-        if (dinsTauler(inici.fila, inici.col) && tauler[inici.fila][inici.col] == BUIT) extrems++;
-        if (dinsTauler(fi.fila, fi.col) && tauler[fi.fila][fi.col] == BUIT) extrems++;
+        if (dinsTauler(inici) && tauler[inici.fila][inici.col] == BUIT) extrems++;
+        if (dinsTauler(fi) && tauler[fi.fila][fi.col] == BUIT) extrems++;
 
         if (countM == 4) return 1000000;
         if (countM == 3) {

@@ -25,7 +25,7 @@ void inicialitzarTauler(char tauler[N][N]);
 void dibuixarTauler(char tauler[N][N],Posicio linia[4]);
 void escriureTaulerFitxer(FILE *fitxer, char tauler[N][N]);
 int columnaValida(char tauler[N][N], int col);
-int dinsTauler(int fila, int col);
+int dinsTauler(Posicio p);
 int taulerPle(char tauler[N][N]);
 int taulerBuit(char tauler[N][N]);
 int tirada(char tauler[N][N],int col,char fitxa);
