@@ -408,7 +408,7 @@ double ferminimax(Node *p, int nivell, int *col) {
     //Pas 1: comprovar si estem a les fulles ( és a dir al nivell maxim de l'arbre)
     if (p->n_fills == 0) {return p->valor;}
     //Pas 2:Separar els casos en si estem fent maxim o minim
-    int columna=numFillAColumna(p->tauler, 0);// inicialitzem amb la primera columna posible
+    int columna = (col != NULL)? numFillAColumna(p->tauler, 0):0;// inicialitzem amb la primera columna posible i nomès si el necesitem
     //Cas maxim
     if (nivell % 2 ==0) {
         double aux = -INFINIT;
@@ -441,6 +441,47 @@ double ferminimax(Node *p, int nivell, int *col) {
     }
 }
 
+//double ferminimax(Node *p, int nivell, int *col) {
+//    //Pas 1: comprovar si estem a les fulles ( és a dir al nivell maxim de l'arbre)
+//    if (p->n_fills == 0) {return p->valor;}
+//    //Pas 2:Separar els casos en si estem fent maxim o minim
+//    //int columna=numFillAColumna(p->tauler, 0);// inicialitzem amb la primera columna posible
+//    int millorFill=0;
+//    //Cas maxim
+//    if (nivell % 2 ==0) {
+//        double aux = -INFINIT;
+//        for (int i = 0; i < p->n_fills; i++) {
+//            double v = ferminimax(p->fills[i], nivell + 1, NULL);
+//            if (v > aux) {//calcular el maxim entre el valors i calcular la columna que es la jugada
+//                aux = v;
+//                millorFill=i;
+//                //if (col != NULL) {columna = numFillAColumna(p->tauler, i);}
+//            }
+//            printf("Fill %d -> valor minimax: %.2f\n", i,v);
+//        }
+//        p->valor = aux;
+//        if (col != NULL) *col = numFillAColumna(p->tauler, millorFill);
+//        return aux;
+//    }
+//    //Cas minim
+//    else {
+//        double aux = INFINIT;
+//        for (int i = 0; i < p->n_fills; i++) {
+//            double v = ferminimax(p->fills[i], nivell + 1, NULL);
+//            if (v < aux) {//calcular el minim entre el valors i calcular la columna que es la jugada
+//                aux = v;
+//                millorFill=i;
+//                //if (col != NULL) {columna = numFillAColumna(p->tauler, i);}
+//            }
+//            printf("Fill %d -> valor minimax: %.2f\n", i,v);
+//        }
+//        p->valor = aux;
+//
+//        if (col != NULL) *col =numFillAColumna(p->tauler, millorFill);
+//        return aux;
+//    }
+//}
+
 //Funcio que crea l'arbre per despres fer el minimax i alhora calcula la columna que necesita
 int ferminimax_arbre(char tauler[N][N], int dificultat) {
     int col=-1;
@@ -469,7 +510,7 @@ int ferminimax_arbre(char tauler[N][N], int dificultat) {
 int main1() {
     srand(time(NULL));
     int dificultat =7;
-    char tauler1[N][N] = {
+    char tauler[N][N] = {
     {'X', 'X', 'X', ' ', ' ', ' ', 'X', 'X'},   // fila 0
     {'X', 'O', 'X', ' ', ' ', ' ', 'O', 'O'},   // fila 1
     {'O', 'O', 'O', ' ', ' ', ' ', 'X', 'X'},   // fila 2
@@ -513,8 +554,8 @@ int main1() {
     {'O', 'X', 'O', 'X', 'O', 'X', 'O', 'X'}
     };
 
-    char tauler[8][8];
-    inicialitzaTaulerRandom(tauler);
+    char tauler1[8][8];
+    //inicialitzaTaulerRandom(tauler);
 
 	Node arrel;
     inicialitzarTauler(arrel.tauler);

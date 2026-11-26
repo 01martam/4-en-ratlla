@@ -252,11 +252,12 @@ double avalua(char tauler[N][N], int fila, int col, int df, int dc, int modo) {
 
     // Comptar fitxes
     for (int k = 0; k < 4; k++) {
-        int f = fila + k * df;
-        int c = col + k * dc;
-        if (!dinsTauler(f, c)) return 0;
-        if (tauler[f][c] == MAQUINA) countM++;
-        else if (tauler[f][c] == JUGADOR) countJ++;
+        Posicio c={fila + k * df,col + k * dc};
+        //int f = fila + k * df;
+        //int c = col + k * dc;
+        if (!dinsTauler(c.fila, c.col)) return 0;
+        if (tauler[c.fila][c.col] == MAQUINA) countM++;
+        else if (tauler[c.fila][c.col] == JUGADOR) countJ++;
     }
 
     // Si hi ha fitxes dels dos, no és útil
@@ -280,11 +281,12 @@ double avalua(char tauler[N][N], int fila, int col, int df, int dc, int modo) {
         // Mode avançat (avalua2)
         // Comprovar extrems
         int extrems = 0;
-        int f_inici = fila - df, c_inici = col - dc;
-        int f_fi = fila + 4 * df, c_fi = col + 4 * dc;
+        Posicio inici={fila - df,col - dc},fi={fila + 4 * df, col + 4 * dc};
+        //int f_inici = fila - df, c_inici = col - dc;
+        //int f_fi = fila + 4 * df, c_fi = col + 4 * dc;
 
-        if (dinsTauler(f_inici, c_inici) && tauler[f_inici][c_inici] == BUIT) extrems++;
-        if (dinsTauler(f_fi, c_fi) && tauler[f_fi][c_fi] == BUIT) extrems++;
+        if (dinsTauler(inici.fila, inici.col) && tauler[inici.fila][inici.col] == BUIT) extrems++;
+        if (dinsTauler(fi.fila, fi.col) && tauler[fi.fila][fi.col] == BUIT) extrems++;
 
         if (countM == 4) return 1000000;
         if (countM == 3) {

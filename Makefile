@@ -14,18 +14,20 @@ PROGS=JOC$(EXT)
 
 all : $(PROGS)
 
-main.o :main.c 4_enratlla.h Arbre.h
+main.o :main.c 4_enratlla.h Arbre.h funcioHeuristica.h
 	gcc -c $(CFLAGS) main.c -o main.o
 
-4_enratlla.o : 4_enratlla.c 4_enratlla.h
+4_enratlla.o : 4_enratlla.c 4_enratlla.h funcioHeuristica.h
 	gcc -c $(CFLAGS) 4_enratlla.c -o 4_enratlla.o
 
-Arbre.o : Arbre.c Arbre.h 4_enratlla.h
+Arbre.o : Arbre.c Arbre.h 4_enratlla.h funcioHeuristica.h
 	gcc -c $(CFLAGS)  Arbre.c -o  Arbre.o
 
+funcioHeuristica.o : funcioHeuristica.c Arbre.h 4_enratlla.h funcioHeuristica.h
+	gcc -c $(CFLAGS)  funcioHeuristica.c -o funcioHeuristica.o
 
-JOC$(EXT) : main.o 4_enratlla.o Arbre.o
-	gcc $(CFLAGS) -o $@ main.o 4_enratlla.o Arbre.o
+JOC$(EXT) : main.o 4_enratlla.o Arbre.o funcioHeuristica.o
+	gcc $(CFLAGS) -o $@ main.o 4_enratlla.o Arbre.o funcioHeuristica.o
 
 clean :
 
@@ -33,3 +35,4 @@ clean :
 
 realclean : clean
 	-$(RM) $(PROGS)
+
