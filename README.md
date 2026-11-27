@@ -84,18 +84,25 @@ Per què fills és un array dinàmic? L’algorisme del MiniMax es basa en desen
 Es donen implementades les següents funcions:
 - Funcions per crear un arbre:
   Node *creaNode(int num_fills) //crea 1 node
+  
   void crea1Nivell(Node *) //crea els fills d’1 node
-  void creaArbre(Node *) //crea 2 nivells d‘arbre, a partir d’un node 
+  
+  void creaArbre(Node *) //crea 2 nivells d‘arbre, a partir d’un node
+  
 - Funcions per veure el contingut d’un arbre:
   void recorreArbre(Node *) //Es mostrarà la versió recursiva. Podeu fer-la servir per entendre la recursivitat en aquesta pràctica. Aquesta funció recorre tot l’arbre (és una funció exemple de com recórrer tot l’arbre que no té cap incidència en la pràctica final: no cal presentar-la).
 
 Falten per fer altres funcions, com les que permeten esborrar l’arbre i fer anar el minimax: 
 - Funcions que permeten esborrar. Es proposen aquestes 3 funcions simplement per seguir la mateixa estructura que la creació de l’arbre, però es pot reduir la seva quantitat si es creu necessari (hi ha llibertat en aquest sentit):
   void esborraNode(Node *) //esborra 1 node de l’arbre
+  
   void esborra1Nivell(Node *) //esborra tots els fills d’1 node, però no aquest
+  
   void esborraArbre(Node *) //esborra tots els nodes de l’arbre, passant-li l’arrel
+  
 - Funció (recursiva) per decidir a quina columna tirar:
-  int ferMinimax(Node *) //retorna la columna escollida per a la millor jugada 
+  int ferMinimax(Node *) //retorna la columna escollida per a la millor jugada
+  
 - moltes altres... (copiar el tauler als nodes fills aplicant el moviment desitjat, etc.)
 
 El que hem implementat amb aquestes funcions és l’algorisme del MiniMax. És a dir, hem intentat implementar un algorisme sense tenir en compte el joc al qual l’aplicarem. Però això no ha estat del tot possible, ja que depenem del joc en molts aspectes, com ara decidir quants fills tindrà un node, etc.  
