@@ -1,15 +1,27 @@
 # 4 en ratlla
-[Practica minimax.pdf](practica_minimax.pdf)  
-[slides](slides_4enratlla.pdf)
+El Manual és una explicació del que fa cada funció del programa, i la compilació i ús del programa i com és el programa: [Manual.pdf](https://github.com/user-attachments/files/35519376/Manual.pdf)
 
-## 0.Entrega
+Nota:
+>COMENMTARIS:
+
+## 0.Ideas a afegir
+- [ ] Fer que es guardi els rècords en un fitxer per tal de quan tornem a iniciar el programa puguem cargar-lo a dins i només actualitzar-lo i no comença de zero.
+- [ ] Fer que puguem interrumpir una partida a la meitat i que es guardi l'estat actual i les seves caracteristiques en un fitxer.
+- [ ] Fer que puguem cargar una partida començada (guardada en un fitxer), però no acabada per continuar-la amb totes les configuracions que tenia. O fins i per poder canviar configuracions.
+- [ ] Fer que puguem accedir al menú a la meitat de la partida, per tal de canviar la configuració o terminar el programa.(Per exemple, escribint 0).
+- [ ] Fer que puguem retrocedi la jugada que hem fet, per canviar-la.
+- [ ] Escollir el nivell de dificultat de l'asistent.
+
+Ara farem una explicació/guió del que volem fer:
+[slides](slides_4enratlla.pdf) 
+<!--## 0.Entrega
 **Data d’entrega:** Fins el 30 de Novembre (inclòs). Es valorarà si s’entrega abans. Entregar-la consisteix en enviar-la per e-mail (fitxers .c i .h, no executables), i serà la data considerada d’entrega.  
 Per a validar la nota de la pràctica, és obligatori fer una entrevista personal, que serà a posteriori de 
 l’entrega.  
 **Entrevista personal:** l’entrevista es farà presencialment.  
 **Dades del professor:** Vicenç Soler. email: Vicenc.Soler@uab.cat.  
 Despatx QC-2032, 2ª planta, Escola d’Enginyeria. Per a consultes sobre la pràctica (o de l’assignatura), m’ho podeu consultar en horari de classe o enviant-me email (o per Teams). 
-
+-->
 ## 1.Algorisme del MiniMax 
 L’algorisme del minimax és un mètode per a la selecció de la millor elecció d’acció en situació, o joc, on dos jugadors treballen oposadament per a aconseguir objectius diferents, actuant sobre el mateix conjunt d’informació. S’aplica específicament en la cerca d’arbres de jocs per a determinar el millor moviment pel jugador actual del joc (el que li toca moure). Fa servir el simple principi que a cada moviment, el jugador que mou escollirà el millor moviment disponible.  
 
@@ -134,23 +146,18 @@ Podeu implementar tantes millores com cregueu necessàries. Es valorarà qualsev
 
 ### 4.1.**Consells**
 Alguns consells per a implementar la pràctica: 
-- [ ] Si teniu dificultats en on i com començar la pràctica, inicialment feu un joc del 4 en ratlla on juguin 2 jugadors humans, sense implementar el MiniMax. Fixeu-vos bé si hi ha algun tros de codi duplicat que pugueu ficar en una sola funció cridant-la vàries vegades. S’ha d’intentar evitar el codi duplicat.
-- [ ] Una vegada l’aplicació funcioni per a 2 jugadors humans, implementeu una funció que 
-decideixi la columna on tirarà l’ordinador en el seu torn. Aquesta funció ha d’implementar el 
-MiniMax: a partir d’un node inicial (o directament del tauler actual) ha de retornar un enter
-que indica la columna on es tirarà. Cada vegada que li toqui tirar a l’ordinador, prendrà la 
-decisió d’on tirar depenent del resultat de l’algorisme Minimax. Per tant, cada vegada s’haurà 
-de:
- - [ ] Crear l’arbre del Minimax
- - [ ] Calcular, fent servir l’algorisme de Minimax, quina és la tirada a fer.
- - [ ] Destruir l’arbre creat.
-- [ ] Els valors dels nodes fulla han de ser calculats via la funció heurística, que pot donar els valor aleatòriament o d’una altra manera més treballada.
-- [ ] Dividir en funcions i fer servir constants quan calguin. No barrejar el codi i separar-ho bé. Intentar fer servir noms de variables i funcions intel·ligibles.
-- [ ] Implementar-ho en els 4 fitxers descrits abans. Si voleu implementar més fitxers, cap problema.
-- [ ] Fer arbres de profunditat > 2. En el tipus de jugades que es planteja fins ara, l’ordinador, al preveure quin futur tindrà la seva jugada, només veu la propera tirada que farà el jugador humà (si fem arbre de 2 nivells).S’haurà de poder decidir la profunditat de l’arbre, podent preveure més d’una jugada en el futur. La profunditat la podeu implementar com una constant definida, per a què sempre busqui la mateixa profunditat. S’ha d’implementar fent servir recursivitat.
-- [ ] Afegeix els paràmetres que necessitis a les funcions definides pel professor. El professor ha donat una pauta de com fer l’arbre, però és possible que algunes funcions requereixin d’informació addicional a passar per paràmetre. Teniu llibertat per a aplicar els canvis que necessiteu.
-- [ ] El tauler es guardarà en una matriu que haureu de revisar, per exemple, per saber si algun dels 2 jugadors guanya. Eviteu sortir-vos de la matriu quan la recorreu per evitar errors (per exemple, si la matriu és 8x8 no aneu a consultar què hi ha a la columna 9, ja que no existeix). C us deixarà fer-ho, però no té cap sentit.
-- [ ] Tota la memòria que es reserva, s’ha d’alliberar. És a dir, s’han de fer el mateix nombre de 
+- [x] Si teniu dificultats en on i com començar la pràctica, inicialment feu un joc del 4 en ratlla on juguin 2 jugadors humans, sense implementar el MiniMax. Fixeu-vos bé si hi ha algun tros de codi duplicat que pugueu ficar en una sola funció cridant-la vàries vegades. S’ha d’intentar evitar el codi duplicat.
+- [x] Una vegada l’aplicació funcioni per a 2 jugadors humans, implementeu una funció que decideixi la columna on tirarà l’ordinador en el seu torn. Aquesta funció ha d’implementar el MiniMax: a partir d’un node inicial (o directament del tauler actual) ha de retornar un enter que indica la columna on es tirarà. Cada vegada que li toqui tirar a l’ordinador, prendrà la decisió d’on tirar depenent del resultat de l’algorisme Minimax. Pertant, cada vegada s’haurà de:
+    - [x] Crear l’arbre del Minimax
+    - [x] Calcular, fent servir l’algorisme de Minimax, quina és la tirada a fer.
+    - [x] Destruir l’arbre creat.
+    - [x] Els valors dels nodes fulla han de ser calculats via la funció heurística, que pot donar els valor aleatòriament o d’una altra manera més treballada.
+    - [x] Dividir en funcions i fer servir constants quan calguin. No barrejar el codi i separar-ho bé. Intentar fer servir noms de variables i funcions intel·ligibles.
+    - [x] Implementar-ho en els 4 fitxers descrits abans. Si voleu implementar més fitxers, cap problema.
+    - [x] Fer arbres de profunditat > 2. En el tipus de jugades que es planteja fins ara, l’ordinador, al preveure quin futur tindrà la seva jugada, només veu la propera tirada que farà el jugador humà (si fem arbre de 2 nivells).S’haurà de poder decidir la profunditat de l’arbre, podent preveure més d’una jugada en el futur. La profunditat la podeu implementar com una constant definida, per a què sempre busqui la mateixa profunditat. S’ha d’implementar fent servir recursivitat.
+- [x] Afegeix els paràmetres que necessitis a les funcions definides pel professor. El professor ha donat una pauta de com fer l’arbre, però és possible que algunes funcions requereixin d’informació addicional a passar per paràmetre. Teniu llibertat per a aplicar els canvis que necessiteu.
+- [x] El tauler es guardarà en una matriu que haureu de revisar, per exemple, per saber si algun dels 2 jugadors guanya. Eviteu sortir-vos de la matriu quan la recorreu per evitar errors (per exemple, si la matriu és 8x8 no aneu a consultar què hi ha a la columna 9, ja que no existeix). C us deixarà fer-ho, però no té cap sentit.
+- [x] Tota la memòria que es reserva, s’ha d’alliberar. És a dir, s’han de fer el mateix nombre de 
 malloc’s que de free’s, quan es construeix i es destrueix l’arbre.
 ## 5. Millores
 A continuació es proposen una sèrie de millores. No tenen perquè ser només aquestes, i vosaltres en 
